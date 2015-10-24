@@ -15,6 +15,7 @@
 
 package org.gearvrf.planetarium;
 
+import android.opengl.Matrix;
 import android.os.Environment;
 
 import java.io.BufferedReader;
@@ -41,6 +42,7 @@ import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
 import org.gearvrf.scene_objects.GVRCubeSceneObject;
 import org.gearvrf.scene_objects.GVRSphereSceneObject;
+import org.gearvrf.scene_objects.GVRTextViewSceneObject;
 import org.gearvrf.utility.Log;
 
 public class PlanetariumViewManager extends GVRScript {
@@ -67,6 +69,57 @@ public class PlanetariumViewManager extends GVRScript {
         starList = new ArrayList<>();
         loadStars(starList);
 
+        /*
+        Star s1 = new Star();
+        starList.add(s1);
+        s1.x = 10;
+        s1.y = 10;
+        s1.z = -10;
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = -10;
+        s1.y = 10;
+        s1.z = -10;
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = -10;
+        s1.y = -10;
+        s1.z = -10;
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = 10;
+        s1.y = -10;
+        s1.z = -10;
+
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = 10;
+        s1.y = 10;
+        s1.z = 10;
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = -10;
+        s1.y = 10;
+        s1.z = 10;
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = -10;
+        s1.y = -10;
+        s1.z = 10;
+
+        s1 = new Star();
+        starList.add(s1);
+        s1.x = 10;
+        s1.y = -10;
+        s1.z = 10;
+*/
+
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
 
             @Override
@@ -79,41 +132,38 @@ public class PlanetariumViewManager extends GVRScript {
         });
 
         mMainScene.setFrustumCulling(true);
-
-        mMainScene.getMainCameraRig().getLeftCamera()
-                .setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
-        mMainScene.getMainCameraRig().getRightCamera()
-                .setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-        mMainScene.getMainCameraRig().getTransform()
-                .setPosition(0.0f, 0.0f, 0.0f);
+        mMainScene.getMainCameraRig().getLeftCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
+        mMainScene.getMainCameraRig().getRightCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
+        mMainScene.getMainCameraRig().getTransform().setPosition(0.0f, 0.0f, 0.0f);
 
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
 
-
-
         GVRMaterial gmat = new GVRMaterial(gvrContext);
-        GVRBitmapTexture gtex = new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128});
+        GVRBitmapTexture gtex = new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {0x7f,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128});
         gmat.setMainTexture(gtex);
         gmat.setColor(0xffffff);
 
-        for (Star s : starList) {
-            if (s.mag > 5) {
+        for (Star star : starList) {
+            if (star.mag > 5) {
                 continue;
             }
 
             //GVRSphereSceneObject sobj = new GVRSphereSceneObject(gvrContext, 3, 3);
             //GVRCubeSceneObject sobj = new GVRCubeSceneObject(gvrContext);
-            GVRSceneObject sobj = new GVRSceneObject(gvrContext, 3, 3, gtex);
-            sobj.getTransform().setPosition(s.x, s.y, s.z);
-            sobj.getTransform().setRotation(0, 0, 0, 0);
-
-
-            
-
-
             //sobj.getRenderData().setMaterial(gmat);
+
+            GVRSceneObject sobj = new GVRSceneObject(gvrContext, 3, 3, gtex);
+            sobj.getTransform().setPosition(0, 0, -star.dist);
+            sobj.getTransform().rotateByAxisWithPivot((float) star.ra, 0, 1, 0, 0, 0, 0);
+
+            float x1 = 1, z1 = 0;
+            float c = (float) Math.cos(star.ra);
+            float s = (float) Math.sin(star.ra);
+            float xnew = x1 * c - z1 * s;
+            float znew = x1 * s + z1 * c;
+            sobj.getTransform().rotateByAxisWithPivot((float) star.dec, xnew, 0, znew, 0, 0, 0);
+
             mMainScene.addSceneObject(sobj);
         }
 
@@ -121,14 +171,13 @@ public class PlanetariumViewManager extends GVRScript {
 
 
         GVRSceneObject earthRevolutionObject = new GVRSceneObject(gvrContext);
-        earthRevolutionObject.getTransform().setPosition(22.0f, 0.0f, 0.0f);
+        earthRevolutionObject.getTransform().setPosition(22.0f, 5.0f, 20.0f);
         solarSystemObject.addChildObject(earthRevolutionObject);
 
         GVRSceneObject earthRotationObject = new GVRSceneObject(gvrContext);
         earthRevolutionObject.addChildObject(earthRotationObject);
 
-        GVRSceneObject earthMeshObject = asyncSceneObject(gvrContext,
-                "earthmap1k.jpg");
+        GVRSceneObject earthMeshObject = asyncSceneObject(gvrContext, "earthmap1k.jpg");
         earthMeshObject.getTransform().setScale(1.0f, 1.0f, 1.0f);
         earthRotationObject.addChildObject(earthMeshObject);
 
@@ -273,6 +322,9 @@ public class PlanetariumViewManager extends GVRScript {
         public float x;
         public float y;
         public float z;
+        public double ra;
+        public double dec;
+        public float dist;
         public float mag;
         public int index;
         public String type;
@@ -294,19 +346,19 @@ public class PlanetariumViewManager extends GVRScript {
                 starList.add(s);
                 s.index = Integer.parseInt(lineArr[0]);
 
-                double ra = Double.parseDouble(lineArr[1]);
-                double dec = Double.parseDouble(lineArr[2]);
-                double dist = Double.parseDouble(lineArr[3]);
+                s.ra = Double.parseDouble(lineArr[1]);
+                s.dec = Double.parseDouble(lineArr[2]);
+                s.dist = (float)Double.parseDouble(lineArr[3]);
 
-                // TEMP: set distance to fixed value
-                dist = 1000;
+                // TEMP: make it a fixed distance for now
+                s.dist = 500;
 
                 s.mag = Float.parseFloat(lineArr[4]);
                 s.type = lineArr[5];
 
-                s.x = (float) ((dist * Math.cos(dec)) * Math.cos(ra));
-                s.y = (float) ((dist * Math.cos(dec)) * Math.sin(ra));
-                s.z = (float) (dist * Math.sin(dec));
+                s.x = (float) ((s.dist * Math.cos(s.dec)) * Math.cos(s.ra));
+                s.y = (float) ((s.dist * Math.cos(s.dec)) * Math.sin(s.ra));
+                s.z = (float) (s.dist * Math.sin(s.dec));
             };
         } catch (IOException e) {
             Log.e(TAG, "Failed to read star database.", e);
