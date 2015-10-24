@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.gearvrf.solarsystem;
+package org.gearvrf.planetarium;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,10 +31,10 @@ import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
 import org.gearvrf.utility.Log;
 
-public class SolarViewManager extends GVRScript {
+public class PlanetariumViewManager extends GVRScript {
 
     @SuppressWarnings("unused")
-    private static final String TAG = Log.tag(SolarViewManager.class);
+    private static final String TAG = Log.tag(PlanetariumViewManager.class);
 
     private GVRAnimationEngine mAnimationEngine;
     private GVRScene mMainScene;

@@ -14,22 +14,22 @@
  */
 
 
-package org.gearvrf.solarsystem;
+package org.gearvrf.planetarium;
 
 import android.os.Bundle;
 import android.view.MotionEvent;
 
 import org.gearvrf.GVRActivity;
 
-public class SolarActivity extends GVRActivity {
+public class MainActivity extends GVRActivity {
 
-    private SolarViewManager viewManager;
+    private PlanetariumViewManager viewManager;
     private long lastDownTime;
 
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        viewManager = new SolarViewManager();
+        viewManager = new PlanetariumViewManager();
         setScript(viewManager, "gvr_note4.xml");
     }
 
