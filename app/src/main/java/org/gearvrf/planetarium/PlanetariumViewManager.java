@@ -94,7 +94,8 @@ public class PlanetariumViewManager extends GVRScript {
 
 
         GVRMaterial gmat = new GVRMaterial(gvrContext);
-        gmat.setMainTexture(new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128}));
+        GVRBitmapTexture gtex = new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128});
+        gmat.setMainTexture(gtex);
         gmat.setColor(0xffffff);
 
         for (Star s : starList) {
@@ -103,9 +104,16 @@ public class PlanetariumViewManager extends GVRScript {
             }
 
             //GVRSphereSceneObject sobj = new GVRSphereSceneObject(gvrContext, 3, 3);
-            GVRCubeSceneObject sobj = new GVRCubeSceneObject(gvrContext);
+            //GVRCubeSceneObject sobj = new GVRCubeSceneObject(gvrContext);
+            GVRSceneObject sobj = new GVRSceneObject(gvrContext, 3, 3, gtex);
             sobj.getTransform().setPosition(s.x, s.y, s.z);
-            sobj.getRenderData().setMaterial(gmat);
+            sobj.getTransform().setRotation(0, 0, 0, 0);
+
+
+            
+
+
+            //sobj.getRenderData().setMaterial(gmat);
             mMainScene.addSceneObject(sobj);
         }
 
