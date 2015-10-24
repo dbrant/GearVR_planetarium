@@ -15,20 +15,32 @@
 
 package org.gearvrf.planetarium;
 
+import android.os.Environment;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.gearvrf.GVRAndroidResource;
+import org.gearvrf.GVRBitmapTexture;
 import org.gearvrf.GVRContext;
+import org.gearvrf.GVRMaterial;
+import org.gearvrf.GVRMaterialShaderId;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScript;
+import org.gearvrf.GVRStockMaterialShaderId;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
 import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
+import org.gearvrf.scene_objects.GVRCubeSceneObject;
+import org.gearvrf.scene_objects.GVRSphereSceneObject;
 import org.gearvrf.utility.Log;
 
 public class PlanetariumViewManager extends GVRScript {
@@ -38,6 +50,8 @@ public class PlanetariumViewManager extends GVRScript {
 
     private GVRAnimationEngine mAnimationEngine;
     private GVRScene mMainScene;
+
+    private List<Star> starList;
 
     private GVRSceneObject asyncSceneObject(GVRContext context,
             String textureName) throws IOException {
@@ -49,6 +63,9 @@ public class PlanetariumViewManager extends GVRScript {
     @Override
     public void onInit(GVRContext gvrContext) throws IOException {
         mAnimationEngine = gvrContext.getAnimationEngine();
+
+        starList = new ArrayList<>();
+        loadStars(starList);
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
 
@@ -74,14 +91,59 @@ public class PlanetariumViewManager extends GVRScript {
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
 
+
+
+        GVRMaterial gmat = new GVRMaterial(gvrContext);
+        gmat.setMainTexture(new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128}));
+        gmat.setColor(0xffffff);
+
+        for (Star s : starList) {
+            if (s.mag > 5) {
+                continue;
+            }
+
+            //GVRSphereSceneObject sobj = new GVRSphereSceneObject(gvrContext, 3, 3);
+            GVRCubeSceneObject sobj = new GVRCubeSceneObject(gvrContext);
+            sobj.getTransform().setPosition(s.x, s.y, s.z);
+            sobj.getRenderData().setMaterial(gmat);
+            mMainScene.addSceneObject(sobj);
+        }
+
+
+
+
+        GVRSceneObject earthRevolutionObject = new GVRSceneObject(gvrContext);
+        earthRevolutionObject.getTransform().setPosition(22.0f, 0.0f, 0.0f);
+        solarSystemObject.addChildObject(earthRevolutionObject);
+
+        GVRSceneObject earthRotationObject = new GVRSceneObject(gvrContext);
+        earthRevolutionObject.addChildObject(earthRotationObject);
+
+        GVRSceneObject earthMeshObject = asyncSceneObject(gvrContext,
+                "earthmap1k.jpg");
+        earthMeshObject.getTransform().setScale(1.0f, 1.0f, 1.0f);
+        earthRotationObject.addChildObject(earthMeshObject);
+
+        counterClockwise(earthRotationObject, 1.5f);
+
+
+
+
+
+
+
+
+
+/*
+
         GVRSceneObject sunRotationObject = new GVRSceneObject(gvrContext);
         solarSystemObject.addChildObject(sunRotationObject);
 
-        GVRSceneObject sunMeshObject = asyncSceneObject(gvrContext,
-                "sunmap.astc");
+        GVRSceneObject sunMeshObject = asyncSceneObject(gvrContext, "sunmap.astc");
         sunMeshObject.getTransform().setPosition(0.0f, 0.0f, 0.0f);
         sunMeshObject.getTransform().setScale(10.0f, 10.0f, 10.0f);
         sunRotationObject.addChildObject(sunMeshObject);
+
 
         GVRSceneObject mercuryRevolutionObject = new GVRSceneObject(gvrContext);
         mercuryRevolutionObject.getTransform().setPosition(14.0f, 0.0f, 0.0f);
@@ -149,10 +211,12 @@ public class PlanetariumViewManager extends GVRScript {
 
         counterClockwise(moonRevolutionObject, 60f);
 
-        clockwise(mMainScene.getMainCameraRig().getTransform(), 60f);
+        //clockwise(mMainScene.getMainCameraRig().getTransform(), 60f);
 
         counterClockwise(marsRevolutionObject, 1200f);
         counterClockwise(marsRotationObject, 200f);
+        */
+
     }
 
     @Override
@@ -167,7 +231,7 @@ public class PlanetariumViewManager extends GVRScript {
         }
     }
 
-    private List<GVRAnimation> mAnimations = new ArrayList<GVRAnimation>();
+    private List<GVRAnimation> mAnimations = new ArrayList<>();
 
     private void setup(GVRAnimation animation) {
         animation.setRepeatMode(GVRRepeatMode.REPEATED).setRepeatCount(-1);
@@ -194,4 +258,58 @@ public class PlanetariumViewManager extends GVRScript {
                 0.0f, 1.0f, 0.0f, //
                 0.0f, 0.0f, 0.0f));
     }
+
+
+
+    public static class Star {
+        public float x;
+        public float y;
+        public float z;
+        public float mag;
+        public int index;
+        public String type;
+    }
+
+    private void loadStars(List<Star> starList) {
+        InputStream instream = null;
+        try {
+            Log.d(TAG, "Loading stars...");
+            instream = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/stars.txt");
+            BufferedReader buffreader = new BufferedReader(new InputStreamReader(instream));
+            String line;
+            String[] lineArr;
+            buffreader.readLine();
+            while ((line = buffreader.readLine()) != null) {
+                lineArr = line.split("\\s+");
+
+                Star s = new Star();
+                starList.add(s);
+                s.index = Integer.parseInt(lineArr[0]);
+
+                double ra = Double.parseDouble(lineArr[1]);
+                double dec = Double.parseDouble(lineArr[2]);
+                double dist = Double.parseDouble(lineArr[3]);
+
+                // TEMP: set distance to fixed value
+                dist = 1000;
+
+                s.mag = Float.parseFloat(lineArr[4]);
+                s.type = lineArr[5];
+
+                s.x = (float) ((dist * Math.cos(dec)) * Math.cos(ra));
+                s.y = (float) ((dist * Math.cos(dec)) * Math.sin(ra));
+                s.z = (float) (dist * Math.sin(dec));
+            };
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to read star database.", e);
+        } finally {
+            if (instream != null) {
+                try { instream.close(); }
+                catch(Exception e) {
+                    //
+                }
+            }
+        }
+    }
+
 }
