@@ -18,6 +18,7 @@ package org.gearvrf.planetarium;
 import android.graphics.Color;
 import android.opengl.Matrix;
 import android.os.Environment;
+import android.view.Gravity;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.gearvrf.FutureWrapper;
 import org.gearvrf.GVRAndroidResource;
@@ -43,6 +45,7 @@ import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScript;
 import org.gearvrf.GVRStockMaterialShaderId;
+import org.gearvrf.GVRTexture;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
@@ -154,54 +157,42 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.getMainCameraRig().getRightCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
         mMainScene.getMainCameraRig().getTransform().setPosition(0.0f, 0.0f, 0.0f);
 
-
-
-
-
         // head-tracking pointer
         GVRSceneObject headTracker = new GVRSceneObject(gvrContext,
                 new FutureWrapper<>(gvrContext.createQuad(1f, 1f)),
                 gvrContext.loadFutureTexture(new GVRAndroidResource(
-                        gvrContext, R.drawable.headtrackingpointer)));
+                        gvrContext, R.drawable.headtrack)));
         headTracker.getTransform().setPosition(0.0f, 0.0f, -50.0f);
         headTracker.getRenderData().setDepthTest(false);
         headTracker.getRenderData().setRenderingOrder(100000);
         mMainScene.getMainCameraRig().addChildObject(headTracker);
 
-
-
         textView = new GVRTextViewSceneObject(gvrContext, mActivity);
-        textView.getTransform().setPosition(3.0f, 3.0f, -10.0f);
-        textView.setTextSize(textView.getTextSize() * 4);
+        textView.getTransform().setPosition(0.0f, -3.0f, -10.0f);
+        textView.setTextSize(textView.getTextSize());
         textView.setText("Foooo!!!!");
         textView.setTextColor(Color.CYAN);
+        textView.setGravity(Gravity.CENTER);
         textView.setRefreshFrequency(GVRTextViewSceneObject.IntervalFrequency.LOW);
         textView.getRenderData().setDepthTest(false);
         textView.getRenderData().setRenderingOrder(100000);
         mMainScene.getMainCameraRig().addChildObject(textView);
 
 
-
-
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
 
-        //GVRMaterial gmat = new GVRMaterial(gvrContext);
-        GVRBitmapTexture gtex = new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {0x3f,0x7f,0x3f,0x7f,(byte)0xff,0x7f,0x3f,0x7f,0x3f});
-        //gmat.setMainTexture(gtex);
-        //gmat.setColor(0xffffff);
+        GVRMesh mesh = gvrContext.createQuad(4f, 4f);
+        Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star1));
 
         for (Star star : starList) {
             if (star.mag > 3) {
                 continue;
             }
 
-            //GVRSphereSceneObject sobj = new GVRSphereSceneObject(gvrContext, 3, 3);
-            //GVRCubeSceneObject sobj = new GVRCubeSceneObject(gvrContext);
-            //sobj.getRenderData().setMaterial(gmat);
-
-            GVRSceneObject sobj = new GVRSceneObject(gvrContext, 3, 3, gtex);
+            GVRSceneObject sobj = new GVRSceneObject(gvrContext, new FutureWrapper<>(mesh), futureTex);
             sobj.getTransform().setPosition(0, 0, -star.dist);
+            sobj.getRenderData().setDepthTest(false);
             sobj.getTransform().rotateByAxisWithPivot((float) star.ra, 0, 1, 0, 0, 0, 0);
 
             float x1 = 1, z1 = 0;
@@ -232,13 +223,6 @@ public class PlanetariumViewManager extends GVRScript {
         earthRotationObject.addChildObject(earthMeshObject);
 
         counterClockwise(earthRotationObject, 1.5f);
-
-
-
-
-
-
-
 
 
 /*
