@@ -112,9 +112,9 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.getMainCameraRig().addChildObject(headTracker);
 
         textView = new GVRTextViewSceneObject(gvrContext, mActivity);
-        textView.getTransform().setPosition(0.0f, -3.0f, -10.0f);
-        textView.setTextSize(textView.getTextSize());
-        textView.setText("Foooo!!!!");
+        textView.getTransform().setPosition(0.0f, -2.0f, -10.0f);
+        textView.setTextSize(textView.getTextSize() * 1.5f);
+        textView.setText("");
         textView.setTextColor(Color.CYAN);
         textView.setGravity(Gravity.CENTER);
         textView.setRefreshFrequency(GVRTextViewSceneObject.IntervalFrequency.LOW);
@@ -233,7 +233,7 @@ public class PlanetariumViewManager extends GVRScript {
         GVRSceneObject planetMeshObject = asyncSceneObject(context, planetTexture);
         planetMeshObject.getTransform().setScale(1.0f, 1.0f, 1.0f);
         planetRotationObject.addChildObject(planetMeshObject);
-        textView.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET);
+        planetMeshObject.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET);
 
         counterClockwise(planetRotationObject, 10f);
         planetMeshObject.attachEyePointeeHolder();
