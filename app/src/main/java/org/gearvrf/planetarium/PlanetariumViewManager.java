@@ -183,14 +183,21 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.addSceneObject(solarSystemObject);
 
         GVRMesh mesh = gvrContext.createQuad(4f, 4f);
-        Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star1));
+        Future<GVRMesh> futureMesh = new FutureWrapper<>(mesh);
+        GVRTexture gtex = new GVRBitmapTexture(gvrContext, "star2.png");
+        Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star2));
+
+        GVRMaterial gmat = new GVRMaterial(gvrContext);
+        gmat.setMainTexture(futureTex);
+
 
         for (Star star : starList) {
-            if (star.mag > 3) {
+            if (star.mag > 5) {
                 continue;
             }
 
-            GVRSceneObject sobj = new GVRSceneObject(gvrContext, new FutureWrapper<>(mesh), futureTex);
+            GVRSceneObject sobj = new GVRSceneObject(gvrContext, mesh);
+            sobj.getRenderData().setMaterial(gmat);
             sobj.getTransform().setPosition(0, 0, -star.dist);
             sobj.getRenderData().setDepthTest(false);
             sobj.getTransform().rotateByAxisWithPivot((float) star.ra, 0, 1, 0, 0, 0, 0);
