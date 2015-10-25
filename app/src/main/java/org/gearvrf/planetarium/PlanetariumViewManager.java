@@ -31,11 +31,13 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gearvrf.FutureWrapper;
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRBitmapTexture;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMaterialShaderId;
+import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
@@ -63,6 +65,9 @@ public class PlanetariumViewManager extends GVRScript {
     private GVRScene mMainScene;
 
     private List<Star> starList;
+
+    GVRTextViewSceneObject textView;
+
 
     private GVRSceneObject asyncSceneObject(GVRContext context,
             String textureName) throws IOException {
@@ -153,25 +158,38 @@ public class PlanetariumViewManager extends GVRScript {
 
 
 
+        // head-tracking pointer
+        GVRSceneObject headTracker = new GVRSceneObject(gvrContext,
+                new FutureWrapper<>(gvrContext.createQuad(1f, 1f)),
+                gvrContext.loadFutureTexture(new GVRAndroidResource(
+                        gvrContext, R.drawable.headtrackingpointer)));
+        headTracker.getTransform().setPosition(0.0f, 0.0f, -50.0f);
+        headTracker.getRenderData().setDepthTest(false);
+        headTracker.getRenderData().setRenderingOrder(100000);
+        mMainScene.getMainCameraRig().addChildObject(headTracker);
 
-/*
-        GVRTextViewSceneObject textView = new GVRTextViewSceneObject(gvrContext, mActivity);
-        textView.getTransform().setPosition(-4.0f, 0.0f, -2.0f);
+
+
+        textView = new GVRTextViewSceneObject(gvrContext, mActivity);
+        textView.getTransform().setPosition(3.0f, 3.0f, -10.0f);
+        textView.setTextSize(textView.getTextSize() * 4);
         textView.setText("Foooo!!!!");
-        textView.setTextColor(Color.RED);
-        mMainScene.addSceneObject(textView);
-        textView.getTransform().setPositionZ(-3.0f);
-*/
+        textView.setTextColor(Color.CYAN);
+        textView.setRefreshFrequency(GVRTextViewSceneObject.IntervalFrequency.LOW);
+        textView.getRenderData().setDepthTest(false);
+        textView.getRenderData().setRenderingOrder(100000);
+        mMainScene.getMainCameraRig().addChildObject(textView);
 
-        
+
+
 
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
 
-        GVRMaterial gmat = new GVRMaterial(gvrContext);
-        GVRBitmapTexture gtex = new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {0x7f,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128,(byte)128});
-        gmat.setMainTexture(gtex);
-        gmat.setColor(0xffffff);
+        //GVRMaterial gmat = new GVRMaterial(gvrContext);
+        GVRBitmapTexture gtex = new GVRBitmapTexture(gvrContext, 3, 3, new byte[] {0x3f,0x7f,0x3f,0x7f,(byte)0xff,0x7f,0x3f,0x7f,0x3f});
+        //gmat.setMainTexture(gtex);
+        //gmat.setColor(0xffffff);
 
         for (Star star : starList) {
             if (star.mag > 3) {
@@ -312,7 +330,8 @@ public class PlanetariumViewManager extends GVRScript {
     public void onStep() {
 
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
-            mMainScene.addStatMessage("Picked: " + pickedObject.getHitObject().getName());
+            //mMainScene.addStatMessage("Picked: " + pickedObject.getHitObject().getName());
+            textView.setText(pickedObject.getHitObject().getName());
         }
 
     }
