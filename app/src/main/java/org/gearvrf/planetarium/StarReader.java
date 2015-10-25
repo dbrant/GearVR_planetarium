@@ -59,9 +59,6 @@ public class StarReader {
                 s.dec = Double.parseDouble(lineArr[2]);
                 s.dist = (float)Double.parseDouble(lineArr[3]);
 
-                // TEMP: make it a fixed distance for now
-                s.dist = 500;
-
                 s.mag = Float.parseFloat(lineArr[4]);
                 s.type = lineArr[5];
 
