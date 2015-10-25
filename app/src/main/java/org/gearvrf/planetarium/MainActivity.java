@@ -29,7 +29,7 @@ public class MainActivity extends GVRActivity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        viewManager = new PlanetariumViewManager();
+        viewManager = new PlanetariumViewManager(this);
         setScript(viewManager, "gvr_note4.xml");
     }
 

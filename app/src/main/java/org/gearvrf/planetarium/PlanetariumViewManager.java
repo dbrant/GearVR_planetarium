@@ -15,14 +15,19 @@
 
 package org.gearvrf.planetarium;
 
+import android.graphics.Color;
 import android.opengl.Matrix;
 import android.os.Environment;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +36,7 @@ import org.gearvrf.GVRBitmapTexture;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMaterialShaderId;
+import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScript;
@@ -50,6 +56,9 @@ public class PlanetariumViewManager extends GVRScript {
     @SuppressWarnings("unused")
     private static final String TAG = Log.tag(PlanetariumViewManager.class);
 
+    private MainActivity mActivity;
+    private GVRContext mContext;
+
     private GVRAnimationEngine mAnimationEngine;
     private GVRScene mMainScene;
 
@@ -62,8 +71,13 @@ public class PlanetariumViewManager extends GVRScript {
                 new GVRAndroidResource(context, textureName));
     }
 
+    PlanetariumViewManager(MainActivity activity) {
+        mActivity = activity;
+    }
+
     @Override
     public void onInit(GVRContext gvrContext) throws IOException {
+        mContext = gvrContext;
         mAnimationEngine = gvrContext.getAnimationEngine();
 
         starList = new ArrayList<>();
@@ -121,7 +135,6 @@ public class PlanetariumViewManager extends GVRScript {
 */
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
-
             @Override
             public void run() {
                 for (GVRAnimation animation : mAnimations) {
@@ -136,6 +149,22 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.getMainCameraRig().getRightCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
         mMainScene.getMainCameraRig().getTransform().setPosition(0.0f, 0.0f, 0.0f);
 
+
+
+
+
+
+/*
+        GVRTextViewSceneObject textView = new GVRTextViewSceneObject(gvrContext, mActivity);
+        textView.getTransform().setPosition(-4.0f, 0.0f, -2.0f);
+        textView.setText("Foooo!!!!");
+        textView.setTextColor(Color.RED);
+        mMainScene.addSceneObject(textView);
+        textView.getTransform().setPositionZ(-3.0f);
+*/
+
+        
+
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
 
@@ -145,7 +174,7 @@ public class PlanetariumViewManager extends GVRScript {
         gmat.setColor(0xffffff);
 
         for (Star star : starList) {
-            if (star.mag > 5) {
+            if (star.mag > 3) {
                 continue;
             }
 
@@ -163,6 +192,9 @@ public class PlanetariumViewManager extends GVRScript {
             float xnew = x1 * c - z1 * s;
             float znew = x1 * s + z1 * c;
             sobj.getTransform().rotateByAxisWithPivot((float) star.dec, xnew, 0, znew, 0, 0, 0);
+
+            sobj.setName(star.name == null ? "" : star.name);
+            sobj.attachEyePointeeHolder();
 
             mMainScene.addSceneObject(sobj);
         }
@@ -278,6 +310,11 @@ public class PlanetariumViewManager extends GVRScript {
 
     @Override
     public void onStep() {
+
+        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
+            mMainScene.addStatMessage("Picked: " + pickedObject.getHitObject().getName());
+        }
+
     }
 
     void onTap() {
@@ -328,13 +365,14 @@ public class PlanetariumViewManager extends GVRScript {
         public float mag;
         public int index;
         public String type;
+        public String name;
     }
 
     private void loadStars(List<Star> starList) {
         InputStream instream = null;
         try {
             Log.d(TAG, "Loading stars...");
-            instream = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/stars.txt");
+            instream = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/stars2.txt");
             BufferedReader buffreader = new BufferedReader(new InputStreamReader(instream));
             String line;
             String[] lineArr;
@@ -351,7 +389,7 @@ public class PlanetariumViewManager extends GVRScript {
                 s.dist = (float)Double.parseDouble(lineArr[3]);
 
                 // TEMP: make it a fixed distance for now
-                s.dist = 500;
+                s.dist = 200;
 
                 s.mag = Float.parseFloat(lineArr[4]);
                 s.type = lineArr[5];
@@ -359,9 +397,37 @@ public class PlanetariumViewManager extends GVRScript {
                 s.x = (float) ((s.dist * Math.cos(s.dec)) * Math.cos(s.ra));
                 s.y = (float) ((s.dist * Math.cos(s.dec)) * Math.sin(s.ra));
                 s.z = (float) (s.dist * Math.sin(s.dec));
-            };
+            }
         } catch (IOException e) {
             Log.e(TAG, "Failed to read star database.", e);
+        } finally {
+            if (instream != null) {
+                try { instream.close(); instream = null; }
+                catch(Exception e) {
+                    //
+                }
+            }
+        }
+        try {
+            Log.d(TAG, "Loading star names...");
+            instream = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/starnames.dat");
+            BufferedReader buffreader = new BufferedReader(new InputStreamReader(instream));
+            String line;
+            String[] lineArr;
+            buffreader.readLine();
+            while ((line = buffreader.readLine()) != null) {
+                lineArr = line.split(":");
+                int index = Integer.parseInt(lineArr[0]);
+
+                for (Star star : starList) {
+                    if (star.index == index) {
+                        star.name = lineArr[1];
+                    }
+                }
+
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to read star names.", e);
         } finally {
             if (instream != null) {
                 try { instream.close(); }
