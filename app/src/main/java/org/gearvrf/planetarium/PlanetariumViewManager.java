@@ -182,7 +182,7 @@ public class PlanetariumViewManager extends GVRScript {
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
 
-        GVRMesh mesh = gvrContext.createQuad(4f, 4f);
+        GVRMesh mesh = gvrContext.createQuad(10f, 10f);
         Future<GVRMesh> futureMesh = new FutureWrapper<>(mesh);
         GVRTexture gtex = new GVRBitmapTexture(gvrContext, "star2.png");
         Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star2));
@@ -192,22 +192,24 @@ public class PlanetariumViewManager extends GVRScript {
 
 
         for (Star star : starList) {
-            if (star.mag > 5) {
+            if (star.mag > 3) {
                 continue;
             }
 
             GVRSceneObject sobj = new GVRSceneObject(gvrContext, mesh);
             sobj.getRenderData().setMaterial(gmat);
-            sobj.getTransform().setPosition(0, 0, -star.dist);
             sobj.getRenderData().setDepthTest(false);
+            sobj.getTransform().setPosition(0, 0, -star.dist);
+            float scale = 1 / (star.mag < 0.5f ? 0.5f : star.mag);
+            sobj.getTransform().setScale(scale, scale, scale);
             sobj.getTransform().rotateByAxisWithPivot((float) star.ra, 0, 1, 0, 0, 0, 0);
 
             float x1 = 1, z1 = 0;
-            float c = (float) Math.cos(star.ra);
-            float s = (float) Math.sin(star.ra);
+            float c = (float) Math.cos(Math.toRadians(star.ra));
+            float s = (float) Math.sin(Math.toRadians(star.ra));
             float xnew = x1 * c - z1 * s;
             float znew = x1 * s + z1 * c;
-            sobj.getTransform().rotateByAxisWithPivot((float) star.dec, xnew, 0, znew, 0, 0, 0);
+            sobj.getTransform().rotateByAxisWithPivot((float) -star.dec, xnew, 0, znew, 0, 0, 0);
 
             sobj.setName(star.name == null ? "" : star.name);
             sobj.attachEyePointeeHolder();
@@ -219,7 +221,7 @@ public class PlanetariumViewManager extends GVRScript {
 
 
         GVRSceneObject earthRevolutionObject = new GVRSceneObject(gvrContext);
-        earthRevolutionObject.getTransform().setPosition(22.0f, 5.0f, 20.0f);
+        earthRevolutionObject.getTransform().setPosition(20.0f, 0.0f, -20.0f);
         solarSystemObject.addChildObject(earthRevolutionObject);
 
         GVRSceneObject earthRotationObject = new GVRSceneObject(gvrContext);
@@ -399,7 +401,7 @@ public class PlanetariumViewManager extends GVRScript {
                 s.dist = (float)Double.parseDouble(lineArr[3]);
 
                 // TEMP: make it a fixed distance for now
-                s.dist = 200;
+                s.dist = 500;
 
                 s.mag = Float.parseFloat(lineArr[4]);
                 s.type = lineArr[5];
