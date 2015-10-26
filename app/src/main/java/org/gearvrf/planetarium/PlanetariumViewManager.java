@@ -17,6 +17,8 @@ package org.gearvrf.planetarium;
 
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.KeyEvent;
+import android.webkit.WebView;
 
 import com.mhuss.AstroLib.AstroDate;
 import com.mhuss.AstroLib.NoInitException;
@@ -48,6 +50,7 @@ import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
 import org.gearvrf.animation.GVRScaleAnimation;
 import org.gearvrf.scene_objects.GVRTextViewSceneObject;
+import org.gearvrf.scene_objects.GVRWebViewSceneObject;
 import org.gearvrf.utility.Log;
 
 public class PlanetariumViewManager extends GVRScript {
@@ -72,9 +75,14 @@ public class PlanetariumViewManager extends GVRScript {
     private List<GVRAnimation> continuousAnimationList = new ArrayList<>();
     private List<GVRAnimation> unzoomAnimationList = new ArrayList<>();
 
-    GVRMesh genericQuadMesh;
-    GVRTextViewSceneObject textView;
-    GVRLight mLight;
+    private GVRMesh genericQuadMesh;
+    private GVRTextViewSceneObject textView;
+
+    private GVRWebViewSceneObject webViewObject;
+    private boolean webViewVisible;
+
+    private GVRLight mLight;
+
 
     private GVRSceneObject asyncSceneObject(GVRContext context,
                                             String textureName) throws IOException {
@@ -130,6 +138,10 @@ public class PlanetariumViewManager extends GVRScript {
         textView.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
         mMainScene.getMainCameraRig().addChildObject(textView);
 
+        webViewObject = new GVRWebViewSceneObject(gvrContext, 5f, 8f, mActivity.getWebView());
+        webViewObject.getRenderData().getMaterial().setOpacity(1.0f);
+        webViewObject.getTransform().setPosition(4.0f, 2.0f, -16.0f);
+        webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
 
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(solarSystemObject);
@@ -200,11 +212,13 @@ public class PlanetariumViewManager extends GVRScript {
             //
         }
 
-        addNebulaObject(solarSystemObject, R.drawable.m31, hmsToDec(0f, 41.8f, 0f), dmsToDec(41f, 16f, 0f), 10f, "Andromeda (M31)");
-        addNebulaObject(solarSystemObject, R.drawable.m42, hmsToDec(5f, 35.4f, 0f), dmsToDec(5f, 27f, 0f), 10f, "Orion Nebula (M42)");
-        addNebulaObject(solarSystemObject, R.drawable.m51, hmsToDec(13f, 30f, 0f), dmsToDec(47f, 11f, 0f), 5f, "Whirlpool Galaxy (M51)");
-        addNebulaObject(solarSystemObject, R.drawable.m57, hmsToDec(18f, 53.6f, 0f), dmsToDec(33f, 2f, 0f), 10f, "Ring Nebula (M57)");
-        addNebulaObject(solarSystemObject, R.drawable.m101, hmsToDec(14f, 3.2f, 0f), dmsToDec(54f, 21f, 0f), 5f, "Pinwheel Galaxy (M101)");
+        addNebulaObject(solarSystemObject, R.drawable.m1, Util.hmsToDec(5f, 34f, 31.94f), Util.dmsToDec(22f, 0f, 52.2f), 5f, "Crab Nebula");
+        addNebulaObject(solarSystemObject, R.drawable.m16, Util.hmsToDec(18f, 18f, 48f), Util.dmsToDec(-13f, 49f, 0f), 5f, "Eagle Nebula");
+        addNebulaObject(solarSystemObject, R.drawable.m31, Util.hmsToDec(0f, 41.8f, 0f), Util.dmsToDec(41f, 16f, 0f), 10f, "Andromeda");
+        addNebulaObject(solarSystemObject, R.drawable.m42, Util.hmsToDec(5f, 35f, 17.3f), Util.dmsToDec(-5f, 23f, 28f), 5f, "Orion Nebula");
+        addNebulaObject(solarSystemObject, R.drawable.m51, Util.hmsToDec(13f, 30f, 0f), Util.dmsToDec(47f, 11f, 0f), 5f, "Whirlpool Galaxy");
+        addNebulaObject(solarSystemObject, R.drawable.m57, Util.hmsToDec(18f, 53.6f, 0f), Util.dmsToDec(33f, 2f, 0f), 10f, "Ring Nebula");
+        addNebulaObject(solarSystemObject, R.drawable.m101, Util.hmsToDec(14f, 3.2f, 0f), Util.dmsToDec(54f, 21f, 0f), 5f, "Pinwheel Galaxy");
 
     }
 
@@ -235,27 +249,41 @@ public class PlanetariumViewManager extends GVRScript {
             // only care about the first picked object
             break;
         }
-
     }
 
     void onTap() {
-        if (null != mMainScene) {
-            // toggle whether stats are displayed.
-            boolean statsEnabled = mMainScene.getStatsEnabled();
-            mMainScene.setStatsEnabled(!statsEnabled);
+        if (null == mMainScene) {
+            return;
         }
+        webViewVisible = false;
+        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
+            String objName = pickedObject.getHitObject().getName();
+            boolean isPlanet = objName.contains("$");
+            objName = objName.replace("$", "");
+
+            mActivity.loadUrl("about:blank");
+            mActivity.loadUrl("https://en.m.wikipedia.org/wiki/" + objName);
+            webViewVisible = true;
+
+            // only care about the first picked object
+            break;
+        }
+        updateWebViewVisible();
     }
 
+    private void updateWebViewVisible() {
+        if (webViewVisible) {
+            mMainScene.getMainCameraRig().addChildObject(webViewObject);
+        } else {
+            mMainScene.getMainCameraRig().removeChildObject(webViewObject);
+        }
+    }
 
     private void setObjectPosition(GVRSceneObject obj, double ra, double dec, float dist) {
         obj.getTransform().setPosition(0, 0, -dist);
         obj.getTransform().rotateByAxisWithPivot((float) ra, 0, 1, 0, 0, 0, 0);
-        float x1 = 1, z1 = 0;
-        float c = (float) Math.cos(Math.toRadians(ra));
-        float s = (float) Math.sin(Math.toRadians(ra));
-        float xnew = x1 * c - z1 * s;
-        float znew = x1 * s + z1 * c;
-        obj.getTransform().rotateByAxisWithPivot((float) -dec, xnew, 0, znew, 0, 0, 0);
+        obj.getTransform().rotateByAxisWithPivot((float) dec, (float) Math.cos(Math.toRadians(ra)),
+                0, (float) -Math.sin(Math.toRadians(ra)), 0, 0, 0);
     }
 
     private GVRSceneObject addPlanetObject(GVRSceneObject parentObj, double julianDate,
@@ -285,7 +313,7 @@ public class PlanetariumViewManager extends GVRScript {
             planetMeshObject.getRenderData().enableLight();
         }
 
-        counterClockwise(planetRotationObject, 10f);
+        animateCounterClockwise(planetRotationObject, 10f);
         planetMeshObject.attachEyePointeeHolder();
         planetMeshObject.setName(name + "$");
         return planetRevolutionObject;
@@ -304,51 +332,42 @@ public class PlanetariumViewManager extends GVRScript {
         return sobj;
     }
 
-    private void setup(GVRAnimation animation) {
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            if (webViewVisible) {
+                webViewVisible = false;
+                updateWebViewVisible();
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private void setupAnimation(GVRAnimation animation) {
         animation.setRepeatMode(GVRRepeatMode.REPEATED).setRepeatCount(-1);
         continuousAnimationList.add(animation);
     }
 
-    private void counterClockwise(GVRSceneObject object, float duration) {
-        setup(new GVRRotationByAxisWithPivotAnimation( //
-                object, duration, 360.0f, //
-                0.0f, 1.0f, 0.0f, //
+    private void animateCounterClockwise(GVRSceneObject object, float duration) {
+        setupAnimation(new GVRRotationByAxisWithPivotAnimation(
+                object, duration, 360.0f,
+                0.0f, 1.0f, 0.0f,
                 0.0f, 0.0f, 0.0f));
     }
 
-    private void clockwise(GVRSceneObject object, float duration) {
-        setup(new GVRRotationByAxisWithPivotAnimation( //
-                object, duration, -360.0f, //
-                0.0f, 1.0f, 0.0f, //
+    private void animateClockwise(GVRSceneObject object, float duration) {
+        setupAnimation(new GVRRotationByAxisWithPivotAnimation(
+                object, duration, -360.0f,
+                0.0f, 1.0f, 0.0f,
                 0.0f, 0.0f, 0.0f));
     }
 
-    private void clockwise(GVRTransform transform, float duration) {
-        setup(new GVRRotationByAxisWithPivotAnimation( //
-                transform, duration, -360.0f, //
-                0.0f, 1.0f, 0.0f, //
+    private void animateClockwise(GVRTransform transform, float duration) {
+        setupAnimation(new GVRRotationByAxisWithPivotAnimation(
+                transform, duration, -360.0f,
+                0.0f, 1.0f, 0.0f,
                 0.0f, 0.0f, 0.0f));
-    }
-
-
-    private static float hmsToDec(float h, float m, float s) {
-        float ret;
-        ret = h * 15f;
-        ret += m * 0.25f;
-        ret += s * 0.00416667f;
-        return ret;
-    }
-
-    private static float dmsToDec(float d, float m, float s) {
-        float ret = d;
-        if (d < 0f) {
-            ret -= m * 0.016666667f;
-            ret -= s * 2.77777778e-4f;
-        } else {
-            ret += m * 0.016666667f;
-            ret += s * 2.77777778e-4f;
-        }
-        return ret;
     }
 
 }

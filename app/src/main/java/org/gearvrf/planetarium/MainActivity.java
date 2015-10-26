@@ -17,7 +17,11 @@
 package org.gearvrf.planetarium;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import org.gearvrf.GVRActivity;
 
@@ -26,9 +30,12 @@ public class MainActivity extends GVRActivity {
     private PlanetariumViewManager viewManager;
     private long lastDownTime;
 
+    private WebView mWebView;
+
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        createWebView();
         viewManager = new PlanetariumViewManager(this);
         setScript(viewManager, "gvr_note4.xml");
     }
@@ -47,4 +54,39 @@ public class MainActivity extends GVRActivity {
         }
         return true;
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        return viewManager.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
+    }
+
+    public WebView getWebView() {
+        return mWebView;
+    }
+
+    public void loadUrl(final String url) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.loadUrl(url);
+            }
+        });
+    }
+
+    private void createWebView() {
+        mWebView = new WebView(this);
+        mWebView.setInitialScale(300);
+        mWebView.measure(768, 1280);
+        mWebView.layout(0, 0, 768, 1280);
+        WebSettings webSettings = mWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+    }
+
 }
