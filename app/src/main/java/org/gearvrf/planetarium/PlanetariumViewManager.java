@@ -15,10 +15,11 @@
 
 package org.gearvrf.planetarium;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.webkit.WebView;
 
 import com.mhuss.AstroLib.AstroDate;
 import com.mhuss.AstroLib.NoInitException;
@@ -26,6 +27,9 @@ import com.mhuss.AstroLib.ObsInfo;
 import com.mhuss.AstroLib.PlanetData;
 import com.mhuss.AstroLib.Planets;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +45,7 @@ import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
+import org.gearvrf.GVRScreenshotCallback;
 import org.gearvrf.GVRScript;
 import org.gearvrf.GVRTexture;
 import org.gearvrf.GVRTransform;
@@ -335,6 +340,31 @@ public class PlanetariumViewManager extends GVRScript {
     }
 
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+            mContext.captureScreenLeft(new GVRScreenshotCallback() {
+                @Override
+                public void onScreenCaptured(Bitmap bitmap) {
+                    try {
+                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                        int imageIndex = 0;
+                        File f;
+                        String fileName;
+                        do {
+                            fileName = Integer.toString(imageIndex) + ".png";
+                            imageIndex++;
+                        } while ((f = new File(Environment.getExternalStorageDirectory().getPath() + "/" + fileName)).exists());
+                        FileOutputStream fo = new FileOutputStream(f);
+                        fo.write(bytes.toByteArray());
+                        fo.close();
+                        mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
+                    } catch (Exception e) {
+                        mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
+                    }
+                }
+            });
+        }
+
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             if (webViewVisible) {
                 webViewVisible = false;
