@@ -213,12 +213,14 @@ public class PlanetariumViewManager extends GVRScript {
         }
 
         addNebulaObject(solarSystemObject, R.drawable.m1, Util.hmsToDec(5f, 34f, 31.94f), Util.dmsToDec(22f, 0f, 52.2f), 5f, "Crab Nebula");
+        addNebulaObject(solarSystemObject, R.drawable.m13, Util.hmsToDec(16f, 41f, 41.24f), Util.dmsToDec(36f, 27f, 35.5f), 5f, "Hercules Cluster");
         addNebulaObject(solarSystemObject, R.drawable.m16, Util.hmsToDec(18f, 18f, 48f), Util.dmsToDec(-13f, 49f, 0f), 5f, "Eagle Nebula");
         addNebulaObject(solarSystemObject, R.drawable.m31, Util.hmsToDec(0f, 41.8f, 0f), Util.dmsToDec(41f, 16f, 0f), 10f, "Andromeda");
         addNebulaObject(solarSystemObject, R.drawable.m42, Util.hmsToDec(5f, 35f, 17.3f), Util.dmsToDec(-5f, 23f, 28f), 5f, "Orion Nebula");
         addNebulaObject(solarSystemObject, R.drawable.m51, Util.hmsToDec(13f, 30f, 0f), Util.dmsToDec(47f, 11f, 0f), 5f, "Whirlpool Galaxy");
         addNebulaObject(solarSystemObject, R.drawable.m57, Util.hmsToDec(18f, 53.6f, 0f), Util.dmsToDec(33f, 2f, 0f), 10f, "Ring Nebula");
         addNebulaObject(solarSystemObject, R.drawable.m101, Util.hmsToDec(14f, 3.2f, 0f), Util.dmsToDec(54f, 21f, 0f), 5f, "Pinwheel Galaxy");
+        addNebulaObject(solarSystemObject, R.drawable.etacarinae, Util.hmsToDec(10f, 45f, 3.591f), Util.dmsToDec(-59f, 41f, 4.26f), 5f, "Eta Carinae");
 
     }
 
@@ -226,7 +228,7 @@ public class PlanetariumViewManager extends GVRScript {
     public void onStep() {
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
             String objName = pickedObject.getHitObject().getName();
-            boolean isPlanet = objName.contains("$");
+            boolean isZoomable = objName.contains("$");
             objName = objName.replace("$", "");
 
             textView.setText(objName);
@@ -238,7 +240,7 @@ public class PlanetariumViewManager extends GVRScript {
                 unzoomAnimationList.clear();
             }
 
-            if (isPlanet) {
+            if (isZoomable) {
                 GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, 5f);
                 anim.start(mAnimationEngine);
 
@@ -258,7 +260,7 @@ public class PlanetariumViewManager extends GVRScript {
         webViewVisible = false;
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
             String objName = pickedObject.getHitObject().getName();
-            boolean isPlanet = objName.contains("$");
+            boolean isZoomable = objName.contains("$");
             objName = objName.replace("$", "");
 
             mActivity.loadUrl("about:blank");
