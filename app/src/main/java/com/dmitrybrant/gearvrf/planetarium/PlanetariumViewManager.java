@@ -142,11 +142,6 @@ public class PlanetariumViewManager extends GVRScript {
         webViewObject.getTransform().setPosition(0.0f, -5.0f, -12.0f);
         webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
 
-        // parent object for all other objects in the scene
-        // TODO: remove?
-        GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
-        mMainScene.addSceneObject(solarSystemObject);
-
         // light!
         mLight = new GVRLight(gvrContext);
         mLight.setAmbientIntensity(0.5f, 0.5f, 0.5f, 1.0f);
@@ -189,12 +184,12 @@ public class PlanetariumViewManager extends GVRScript {
 
             } else if (obj.type == SkyObject.TYPE_NEBULA) {
 
-                GVRSceneObject sobj = addNebulaObject(solarSystemObject, obj);
+                GVRSceneObject sobj = addNebulaObject(mMainScene, obj);
                 sobj.setName(Integer.toString(i));
 
             } else if (obj.type == SkyObject.TYPE_PLANET) {
 
-                GVRSceneObject sobj = addPlanetObject(solarSystemObject, obj, i);
+                GVRSceneObject sobj = addPlanetObject(mMainScene, obj, i);
                 if (obj.name.equals("Sun")) {
                     mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
                 }
@@ -275,10 +270,10 @@ public class PlanetariumViewManager extends GVRScript {
                 0, (float) -Math.sin(Math.toRadians(ra)), 0, 0, 0);
     }
 
-    private GVRSceneObject addPlanetObject(GVRSceneObject parentObj, SkyObject obj, int index) throws IOException {
+    private GVRSceneObject addPlanetObject(GVRScene parentObj, SkyObject obj, int index) throws IOException {
         GVRSceneObject planetRevolutionObject = new GVRSceneObject(mContext);
         setObjectPosition(planetRevolutionObject, obj.ra, obj.dec, obj.dist);
-        parentObj.addChildObject(planetRevolutionObject);
+        parentObj.addSceneObject(planetRevolutionObject);
 
         GVRSceneObject planetRotationObject = new GVRSceneObject(mContext);
         planetRevolutionObject.addChildObject(planetRotationObject);
@@ -304,10 +299,10 @@ public class PlanetariumViewManager extends GVRScript {
         return planetRevolutionObject;
     }
 
-    private GVRSceneObject addNebulaObject(GVRSceneObject parentObj, SkyObject obj) throws IOException {
+    private GVRSceneObject addNebulaObject(GVRScene parentObj, SkyObject obj) throws IOException {
         GVRSceneObject sobj = new GVRSceneObject(mContext, genericQuadMesh,
                 mContext.loadTexture(new GVRAndroidResource(mContext, obj.texResId)));
-        parentObj.addChildObject(sobj);
+        parentObj.addSceneObject(sobj);
         sobj.getRenderData().setRenderingOrder(RENDER_ORDER_BACKGROUND);
         sobj.getRenderData().setDepthTest(false);
         sobj.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
