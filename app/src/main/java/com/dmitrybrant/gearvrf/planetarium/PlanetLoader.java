@@ -27,7 +27,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class PlanetLoader {
-    private static final float DEFAULT_DISTANCE_PLANET = 50f;
+    public static final float DEFAULT_DISTANCE_PLANET = 50f;
 
     public static void loadPlanets(GVRContext context, List<SkyObject> objectList) {
         try {
@@ -60,7 +60,7 @@ public class PlanetLoader {
         SkyObject obj = new SkyObject();
         objectList.add(obj);
         obj.type = SkyObject.TYPE_PLANET;
-        obj.dist = DEFAULT_DISTANCE_PLANET;
+        obj.dist = (float)data.getEquatorialRadius();
         obj.initialScale = 1f;
         obj.name = context.getContext().getString(nameResId);
         obj.texName = texName;

@@ -57,7 +57,7 @@ public class PlanetariumViewManager extends GVRScript {
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_BACKGROUND = 0;
 
-    private static final float MAX_STAR_MAGNITUDE = 4.0f;
+    private static final float MAX_STAR_MAGNITUDE = 4.5f;
     private static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private MainActivity mActivity;
@@ -79,13 +79,6 @@ public class PlanetariumViewManager extends GVRScript {
     private boolean webViewAdded;
 
     private GVRLight mLight;
-
-
-    private GVRSceneObject asyncSceneObject(GVRContext context,
-                                            String textureName) throws IOException {
-        return new GVRSceneObject(context, new GVRAndroidResource(context, "sphere.obj"),
-                new GVRAndroidResource(context, textureName));
-    }
 
     PlanetariumViewManager(MainActivity activity) {
         mActivity = activity;
@@ -152,7 +145,7 @@ public class PlanetariumViewManager extends GVRScript {
 
         genericQuadMesh = gvrContext.createQuad(10f, 10f);
 
-        Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star2));
+        Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star3));
         GVRMaterial[] starMaterial = new GVRMaterial[10];
         float colorVal = 0f, colorInc = 0.9f / (float) starMaterial.length;
         for (int i = 0; i < starMaterial.length; i++) {
@@ -160,12 +153,12 @@ public class PlanetariumViewManager extends GVRScript {
             starMaterial[i].setMainTexture(futureTex);
             float c = 0.1f + colorVal;
             colorVal += colorInc;
-            starMaterial[i].setColor(c, c, c * 0.95f);
+            starMaterial[i].setColor(c, c, c * 0.90f);
         }
 
         for (int i = 0; i < skyObjectList.size(); i++) {
             SkyObject obj = skyObjectList.get(i);
-            if (obj.type == SkyObject.TYPE_STAR && obj.mag <= 4.0f) {
+            if (obj.type == SkyObject.TYPE_STAR && obj.mag <= MAX_STAR_MAGNITUDE) {
 
                 int matIndex = (int) (starMaterial.length - obj.mag * ((float) starMaterial.length / MAX_STAR_MAGNITUDE));
                 if (matIndex < 0) { matIndex = 0; }
@@ -176,7 +169,7 @@ public class PlanetariumViewManager extends GVRScript {
                 sobj.getRenderData().setDepthTest(false);
 
                 float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
-                if (scale < 0.75f) { scale = 0.75f; }
+                if (scale < 1f) { scale = 1f; }
                 obj.initialScale = scale;
                 sobj.getTransform().setScale(scale, scale, scale);
                 setObjectPosition(sobj, obj.ra, obj.dec, DEFAULT_DISTANCE_STAR);
@@ -193,7 +186,17 @@ public class PlanetariumViewManager extends GVRScript {
 
                 GVRSceneObject sobj = addPlanetObject(mMainScene, obj, i);
                 if (obj.name.equals("Sun")) {
+                    // let there be light
                     mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
+                } else if (obj.name.equals("Saturn")) {
+                    // TODO: put a ring on it.
+                    /*
+                    GVRSceneObject ringObj = new GVRSceneObject(gvrContext, genericQuadMesh,
+                            mContext.loadTexture(new GVRAndroidResource(mContext, R.drawable.saturn_rings)));
+                    sobj.getChildByIndex(0).addChildObject(ringObj);
+                    ringObj.getTransform().rotateByAxis(90f, 1f, 0f, 0f);
+                    ringObj.getRenderData().setDepthTest(true);
+                    */
                 }
 
             }
@@ -286,13 +289,16 @@ public class PlanetariumViewManager extends GVRScript {
 
     private GVRSceneObject addPlanetObject(GVRScene parentObj, SkyObject obj, int index) throws IOException {
         GVRSceneObject planetRevolutionObject = new GVRSceneObject(mContext);
-        setObjectPosition(planetRevolutionObject, obj.ra, obj.dec, obj.dist);
+        setObjectPosition(planetRevolutionObject, obj.ra, obj.dec, PlanetLoader.DEFAULT_DISTANCE_PLANET);
         parentObj.addSceneObject(planetRevolutionObject);
 
         GVRSceneObject planetRotationObject = new GVRSceneObject(mContext);
         planetRevolutionObject.addChildObject(planetRotationObject);
 
-        GVRSceneObject planetMeshObject = asyncSceneObject(mContext, obj.texName);
+        GVRSceneObject planetMeshObject = new GVRSceneObject(mContext,
+                new GVRAndroidResource(mContext, "sphere.obj"),
+                new GVRAndroidResource(mContext, obj.texName));
+
         planetRotationObject.addChildObject(planetMeshObject);
         planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
         planetMeshObject.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET);
@@ -307,7 +313,12 @@ public class PlanetariumViewManager extends GVRScript {
             planetMeshObject.getRenderData().enableLight();
         }
 
-        animateCounterClockwise(planetRotationObject, 10f);
+        if (obj.name.equals("Moon")) {
+            planetMeshObject.getTransform().rotateByAxis(70f, 0f, 1f, 0f);
+        } else {
+            animateCounterClockwise(planetRotationObject, 10f);
+        }
+
         planetMeshObject.attachEyePointeeHolder();
         planetMeshObject.setName(Integer.toString(index));
         return planetRevolutionObject;

@@ -64,7 +64,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
 
             @Override
             public void onError(Throwable e) {
-                loadIntoWebView("Error loading page.");
+                loadIntoWebView("Error loading page: " + e.getMessage());
                 e.printStackTrace();
             }
         });

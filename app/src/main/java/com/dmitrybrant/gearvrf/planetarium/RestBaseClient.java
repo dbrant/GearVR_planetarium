@@ -16,6 +16,7 @@
 package com.dmitrybrant.gearvrf.planetarium;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -64,7 +65,9 @@ public class RestBaseClient {
 
         @Override
         protected void onPostExecute(String result) {
-            listener.onSuccess(result);
+            if (!TextUtils.isEmpty(result)) {
+                listener.onSuccess(result);
+            }
         }
 
         @Override
@@ -77,7 +80,7 @@ public class RestBaseClient {
     private static String createPageContent(String pageName, JSONObject json) throws JSONException {
         String contentStr = "";
         if (!json.has("sections")) {
-            return "Error: no sections returned.";
+            return "Error: content not found.";
         }
         String displayTitle = pageName;
         if (json.has("displaytitle")) {
@@ -86,23 +89,20 @@ public class RestBaseClient {
         JSONArray sections = json.getJSONArray("sections");
         JSONObject firstSection = (JSONObject) sections.get(0);
         if (!firstSection.has("items")) {
-            return "Error: no items in section.";
-        }
-        JSONArray items = firstSection.getJSONArray("items");
-        JSONObject pobj = null;
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject item = (JSONObject) items.get(i);
-            if (item.getString("type").equals("p")) {
-                pobj = item;
-                break;
-            }
-        }
-        if (pobj == null) {
-            return "Error: no p item found.";
+            return "Error: content not found.";
         }
 
         contentStr += "<h2>" + displayTitle + "</h2>";
-        contentStr += pobj.getString("text");
+
+        JSONArray items = firstSection.getJSONArray("items");
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = (JSONObject) items.get(i);
+            if (item.getString("type").equals("p")) {
+                contentStr += "<p>";
+                contentStr += item.getString("text");
+                contentStr += "</p>";
+            }
+        }
         return contentStr;
     }
 

@@ -24,8 +24,10 @@ public class NebulaLoader {
 
     public static void loadNebulae(GVRContext context, List<SkyObject> objectList) {
         addNebula(context, objectList, R.drawable.m1, Util.hmsToDec(5f, 34f, 31.94f), Util.dmsToDec(22f, 0f, 52.2f), 5f, R.string.m1);
+        addNebula(context, objectList, R.drawable.m8, Util.hmsToDec(18f, 3f, 37f), Util.dmsToDec(-24f, 23f, 12f), 5f, R.string.m8);
         addNebula(context, objectList, R.drawable.m13, Util.hmsToDec(16f, 41f, 41.24f), Util.dmsToDec(36f, 27f, 35.5f), 5f, R.string.m13);
         addNebula(context, objectList, R.drawable.m16, Util.hmsToDec(18f, 18f, 48f), Util.dmsToDec(-13f, 49f, 0f), 5f, R.string.m16);
+        addNebula(context, objectList, R.drawable.m27, Util.hmsToDec(19f, 59f, 36.34f), Util.dmsToDec(-22f, 43f, 16.09f), 5f, R.string.m27);
         addNebula(context, objectList, R.drawable.m31, Util.hmsToDec(0f, 41.8f, 0f), Util.dmsToDec(41f, 16f, 0f), 10f, R.string.m31);
         addNebula(context, objectList, R.drawable.m42, Util.hmsToDec(5f, 35f, 17.3f), Util.dmsToDec(-5f, 23f, 28f), 5f, R.string.m42);
         addNebula(context, objectList, R.drawable.m51, Util.hmsToDec(13f, 30f, 0f), Util.dmsToDec(47f, 11f, 0f), 5f, R.string.m51);
