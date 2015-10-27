@@ -121,6 +121,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
 
     @Override
     public void onScroll(float scrollX, float scrollY) {
+        /*
         if (Math.abs(scrollY) > Math.abs(scrollX)) {
             int scrollAmount = (int) scrollY;
             if (mWebView.getScrollY() - scrollY < 0) {
@@ -128,6 +129,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
             }
             mWebView.scrollBy(0, (int) scrollAmount);
         }
+        */
     }
 
 }

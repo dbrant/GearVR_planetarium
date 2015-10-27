@@ -96,8 +96,8 @@ public class PlanetariumViewManager extends GVRScript {
         mContext = gvrContext;
         mAnimationEngine = gvrContext.getAnimationEngine();
 
-        PlanetLoader.loadPlanets(skyObjectList);
-        NebulaLoader.loadNebulae(skyObjectList);
+        PlanetLoader.loadPlanets(mContext, skyObjectList);
+        NebulaLoader.loadNebulae(mContext, skyObjectList);
         StarReader.loadStars(mActivity, skyObjectList);
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
