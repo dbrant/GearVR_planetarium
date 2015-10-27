@@ -28,18 +28,7 @@ import org.gearvrf.utility.Log;
 public class StarReader {
     public static final String TAG = "StarReader";
 
-    public static class Star {
-        // sorry...
-        public double ra;
-        public double dec;
-        public float dist;
-        public float mag;
-        public int index;
-        public String type;
-        public String name;
-    }
-
-    public static void loadStars(Context context, List<Star> starList) {
+    public static void loadStars(Context context, List<SkyObject> starList) {
         InputStream instream = null;
         try {
             Log.d(TAG, "Loading stars...");
@@ -51,16 +40,17 @@ public class StarReader {
             while ((line = buffreader.readLine()) != null) {
                 lineArr = line.split("\\s+");
 
-                Star s = new Star();
+                SkyObject s = new SkyObject();
                 starList.add(s);
-                s.index = Integer.parseInt(lineArr[0]);
+                s.type = SkyObject.TYPE_STAR;
+                s.catIndex = Integer.parseInt(lineArr[0]);
 
                 s.ra = Double.parseDouble(lineArr[1]);
                 s.dec = Double.parseDouble(lineArr[2]);
                 s.dist = (float)Double.parseDouble(lineArr[3]);
 
                 s.mag = Float.parseFloat(lineArr[4]);
-                s.type = lineArr[5];
+                s.className = lineArr[5];
 
                 // for converting to (x,y,z):
                 //s.x = (float) ((s.dist * Math.cos(s.dec)) * Math.cos(s.ra));
@@ -88,8 +78,8 @@ public class StarReader {
                 lineArr = line.split(":");
                 int index = Integer.parseInt(lineArr[0]);
 
-                for (Star star : starList) {
-                    if (star.index == index) {
+                for (SkyObject star : starList) {
+                    if (star.catIndex == index) {
                         star.name = lineArr[1];
                     }
                 }
