@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.gearvrf.planetarium;
+package com.dmitrybrant.gearvrf.planetarium;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -133,19 +133,19 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.getMainCameraRig().addChildObject(headTracker);
 
         textView = new GVRTextViewSceneObject(gvrContext, mActivity);
-        textView.getTransform().setPosition(0.0f, -2.0f, -10.0f);
+        textView.getTransform().setPosition(0.0f, 2.0f, -10.0f);
         textView.setTextSize(textView.getTextSize());
         textView.setText("");
         textView.setTextColor(Color.CYAN);
         textView.setGravity(Gravity.CENTER);
         textView.setRefreshFrequency(GVRTextViewSceneObject.IntervalFrequency.LOW);
         textView.getRenderData().setDepthTest(false);
-        textView.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
+        textView.getRenderData().setRenderingOrder(RENDER_ORDER_UI + 1);
         mMainScene.getMainCameraRig().addChildObject(textView);
 
         webViewObject = new GVRWebViewSceneObject(gvrContext, 5f, 8f, mActivity.getWebView());
         webViewObject.getRenderData().getMaterial().setOpacity(1.0f);
-        webViewObject.getTransform().setPosition(4.0f, 2.0f, -16.0f);
+        webViewObject.getTransform().setPosition(0.0f, -5.0f, -12.0f);
         webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
 
         GVRSceneObject solarSystemObject = new GVRSceneObject(gvrContext);
@@ -231,6 +231,7 @@ public class PlanetariumViewManager extends GVRScript {
 
     @Override
     public void onStep() {
+        boolean havePicked = false;
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
             String objName = pickedObject.getHitObject().getName();
             boolean isZoomable = objName.contains("$");
@@ -254,7 +255,11 @@ public class PlanetariumViewManager extends GVRScript {
             }
 
             // only care about the first picked object
+            havePicked = true;
             break;
+        }
+        if (!havePicked && textView.getText().length() > 0) {
+            textView.setText("");
         }
     }
 
@@ -268,8 +273,7 @@ public class PlanetariumViewManager extends GVRScript {
             boolean isZoomable = objName.contains("$");
             objName = objName.replace("$", "");
 
-            mActivity.loadUrl("about:blank");
-            mActivity.loadUrl("https://en.m.wikipedia.org/wiki/" + objName);
+            mActivity.loadWebPageForObject(objName);
             webViewVisible = true;
 
             // only care about the first picked object

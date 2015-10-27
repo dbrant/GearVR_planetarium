@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.gearvrf.planetarium;
+package com.dmitrybrant.gearvrf.planetarium;
 
 import android.content.Context;
 

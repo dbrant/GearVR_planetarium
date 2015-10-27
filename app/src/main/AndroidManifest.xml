@@ -14,7 +14,7 @@
  */-->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.gearvrf.planetarium">
+    package="com.dmitrybrant.gearvrf.planetarium">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -32,7 +32,7 @@
             android:value="vr_only" />
 
         <activity
-            android:name="org.gearvrf.planetarium.MainActivity"
+            android:name="com.dmitrybrant.gearvrf.planetarium.MainActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:excludeFromRecents="true"
             android:label="@string/app_name"

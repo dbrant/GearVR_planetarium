@@ -13,10 +13,20 @@
  * limitations under the License.
  */
 
-package org.gearvrf.planetarium;
+package com.dmitrybrant.gearvrf.planetarium;
 
 public class Util {
     public static final String TAG = "Util";
+
+    public static String formatAsHtml(String content) {
+        String html = "<html><head><style type=\"text/css\">" +
+                "body{background-color:#303030;color:#c0c0c0;}" +
+                "a{color:#fff;text-decoration:none;}" +
+                "</style></head><body>";
+        html += content;
+        html += "</body>";
+        return html;
+    }
 
     public static float hmsToDec(float h, float m, float s) {
         float ret;
