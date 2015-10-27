@@ -76,6 +76,7 @@ public class PlanetariumViewManager extends GVRScript {
 
     private GVRWebViewSceneObject webViewObject;
     private boolean webViewVisible;
+    private boolean webViewAdded;
 
     private GVRLight mLight;
 
@@ -141,6 +142,7 @@ public class PlanetariumViewManager extends GVRScript {
         webViewObject.getRenderData().getMaterial().setOpacity(1.0f);
         webViewObject.getTransform().setPosition(0.0f, -5.0f, -12.0f);
         webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
+        mMainScene.addSceneObject(webViewObject);
 
         // light!
         mLight = new GVRLight(gvrContext);
@@ -249,6 +251,14 @@ public class PlanetariumViewManager extends GVRScript {
             mActivity.loadWebPageForObject(obj.name);
             webViewVisible = true;
 
+
+            webViewObject.getTransform().setPosition(0f, 0f, 0f);
+            webViewObject.getTransform().setRotationByAxis(0f, 0f, 0f, 1f);
+            webViewObject.getTransform().setRotationByAxis(0f, 0f, 1f, 0f);
+            webViewObject.getTransform().setRotationByAxis(0f, 1f, 0f, 0f);
+            setObjectPosition(webViewObject, obj.ra, obj.dec, 12f);
+
+
             // only care about the first picked object
             break;
         }
@@ -257,9 +267,13 @@ public class PlanetariumViewManager extends GVRScript {
 
     private void updateWebViewVisible() {
         if (webViewVisible) {
-            mMainScene.getMainCameraRig().addChildObject(webViewObject);
+            if (!webViewAdded) {
+                mMainScene.addSceneObject(webViewObject);
+                webViewAdded = true;
+            }
         } else {
-            mMainScene.getMainCameraRig().removeChildObject(webViewObject);
+            mMainScene.removeSceneObject(webViewObject);
+            webViewAdded = false;
         }
     }
 
