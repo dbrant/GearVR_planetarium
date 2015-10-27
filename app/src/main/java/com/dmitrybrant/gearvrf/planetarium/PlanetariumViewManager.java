@@ -56,8 +56,8 @@ public class PlanetariumViewManager extends GVRScript {
     private static final int RENDER_ORDER_UI = 100000;
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_BACKGROUND = 0;
-    private static final float MAX_STAR_MAGNITUDE = 4.0f;
 
+    private static final float MAX_STAR_MAGNITUDE = 4.0f;
     private static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private MainActivity mActivity;
@@ -176,7 +176,7 @@ public class PlanetariumViewManager extends GVRScript {
                 sobj.getRenderData().setDepthTest(false);
 
                 float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
-                if (scale < 0.5f) { scale = 0.5f; }
+                if (scale < 0.75f) { scale = 0.75f; }
                 obj.initialScale = scale;
                 sobj.getTransform().setScale(scale, scale, scale);
                 setObjectPosition(sobj, obj.ra, obj.dec, DEFAULT_DISTANCE_STAR);
@@ -256,7 +256,7 @@ public class PlanetariumViewManager extends GVRScript {
             webViewObject.getTransform().setRotationByAxis(0f, 0f, 0f, 1f);
             webViewObject.getTransform().setRotationByAxis(0f, 0f, 1f, 0f);
             webViewObject.getTransform().setRotationByAxis(0f, 1f, 0f, 0f);
-            setObjectPosition(webViewObject, obj.ra, obj.dec, 12f);
+            setObjectPosition(webViewObject, obj.ra - 20f, obj.dec, 12f);
 
 
             // only care about the first picked object
