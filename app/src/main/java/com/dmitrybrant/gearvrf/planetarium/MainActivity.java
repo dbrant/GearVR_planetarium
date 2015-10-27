@@ -121,6 +121,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
 
     @Override
     public void onScroll(float scrollX, float scrollY) {
+        viewManager.onScroll(scrollX, scrollY);
         /*
         if (Math.abs(scrollY) > Math.abs(scrollX)) {
             int scrollAmount = (int) scrollY;
