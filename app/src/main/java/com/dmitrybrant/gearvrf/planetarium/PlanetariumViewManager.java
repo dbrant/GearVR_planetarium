@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -90,7 +93,15 @@ public class PlanetariumViewManager extends GVRScript {
         mContext = gvrContext;
         mAnimationEngine = gvrContext.getAnimationEngine();
 
-        PlanetLoader.loadPlanets(mContext, skyObjectList);
+        List<SkyObject> planetObjectList = new ArrayList<>();
+        PlanetLoader.loadPlanets(mContext, planetObjectList);
+        Collections.sort(planetObjectList, new Comparator<SkyObject>() {
+            @Override
+            public int compare(SkyObject lhs, SkyObject rhs) {
+                return lhs.dist < rhs.dist ? -1 : lhs.dist > rhs.dist ? 1 : 0;
+            }
+        });
+        skyObjectList.addAll(planetObjectList);
         NebulaLoader.loadNebulae(mContext, skyObjectList);
         StarReader.loadStars(mActivity, skyObjectList);
 
@@ -124,7 +135,7 @@ public class PlanetariumViewManager extends GVRScript {
 
         // text view...
         textView = new GVRTextViewSceneObject(gvrContext, mActivity);
-        textView.getTransform().setPosition(0.0f, 2.0f, -10.0f);
+        textView.getTransform().setPosition(0.0f, 1.5f, -10.0f);
         textView.setTextSize(textView.getTextSize());
         textView.setText("");
         textView.setTextColor(Color.CYAN);
@@ -204,6 +215,8 @@ public class PlanetariumViewManager extends GVRScript {
 
             }
         }
+
+
     }
 
     @Override
@@ -275,7 +288,7 @@ public class PlanetariumViewManager extends GVRScript {
         if (webViewVisible) {
             if (!webViewAdded) {
                 rootObject.addChildObject(webViewObject);
-                webViewAdded = true; 
+                webViewAdded = true;
             }
         } else {
             rootObject.removeChildObject(webViewObject);
@@ -304,7 +317,7 @@ public class PlanetariumViewManager extends GVRScript {
 
         planetRotationObject.addChildObject(planetMeshObject);
         planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
-        planetMeshObject.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET);
+        planetMeshObject.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET - index);
         planetMeshObject.getRenderData().setDepthTest(false);
 
         if (!obj.name.equals("Sun")) {

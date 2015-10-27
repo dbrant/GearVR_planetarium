@@ -86,7 +86,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
         mWebView.layout(0, 0, 800, 1280);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(false);
-        mWebView.setBackgroundColor(Color.BLACK);
+        mWebView.setBackgroundColor(0xff202020);
     }
 
     @Override
