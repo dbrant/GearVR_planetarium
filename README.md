@@ -1,15 +1,16 @@
 Planetarium for Samsung Gear VR
 ===============================
 
-This is a simple (but not too simple) planetarium app for Samsung Gear VR!
-By Dmitry Brant, Wikimedia Foundation.
+This is a simple (but evolving) planetarium app for Samsung Gear VR!
+
+Dmitry Brant, Wikimedia Foundation.
 
 Features:
 * All stars in the night sky brighter than magnitude 4.5.
 * Textured and correctly-positioned planets (with exaggerated size for easier selection).
 * Small selection of Messier objects.
 * Hover over an object to see its name.
-* Tap on the VR trackpad when hovering over an object to see a detailed description. (Press the Back button or tap in empty space to dismiss the description)
+* Tap on the VR trackpad when hovering over an object to see a detailed description from Wikipedia. (Press the Back button or tap in empty space to dismiss the description)
 * Scroll horizontally on the VR trackpad to shift field of view.
 
 To do:
