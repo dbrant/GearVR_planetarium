@@ -54,20 +54,29 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
         return mWebView;
     }
 
-    public void loadWebPageForObject(final String objectName) {
+    public void loadWebPageForObject(final SkyObject obj) {
         loadIntoWebView("Loading...");
-        RestBaseClient.getPage(objectName, new RestBaseClient.OnGetPageResult() {
-            @Override
-            public void onSuccess(String pageContents) {
-                loadIntoWebView(pageContents);
-            }
+        if (obj.type == SkyObject.TYPE_OTHER) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mWebView.loadUrl("file:///android_asset/about.html");
+                }
+            });
+        } else {
+            RestBaseClient.getPage(Util.transformStarName(obj.name), new RestBaseClient.OnGetPageResult() {
+                @Override
+                public void onSuccess(String pageContents) {
+                    loadIntoWebView(pageContents);
+                }
 
-            @Override
-            public void onError(Throwable e) {
-                loadIntoWebView("Error loading page: " + e.getMessage());
-                e.printStackTrace();
-            }
-        });
+                @Override
+                public void onError(Throwable e) {
+                    loadIntoWebView("Error loading page: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void loadIntoWebView(final String html) {

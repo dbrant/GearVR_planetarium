@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -103,6 +102,7 @@ public class PlanetariumViewManager extends GVRScript {
         });
         skyObjectList.addAll(planetObjectList);
         NebulaLoader.loadNebulae(mContext, skyObjectList);
+        OtherObjLoader.loadObjects(skyObjectList);
         StarReader.loadStars(mActivity, skyObjectList);
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
@@ -191,7 +191,7 @@ public class PlanetariumViewManager extends GVRScript {
                 sobj.attachEyePointeeHolder();
                 rootObject.addChildObject(sobj);
 
-            } else if (obj.type == SkyObject.TYPE_NEBULA) {
+            } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
 
                 GVRSceneObject sobj = addNebulaObject(rootObject, obj);
                 sobj.setName(Integer.toString(i));
@@ -240,7 +240,7 @@ public class PlanetariumViewManager extends GVRScript {
                     anim.start(mAnimationEngine);
                     GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
                     unzoomAnimationList.add(unanim);
-                } else if (obj.type == SkyObject.TYPE_NEBULA) {
+                } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
                     GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 2f);
                     anim.start(mAnimationEngine);
                     GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
@@ -267,16 +267,14 @@ public class PlanetariumViewManager extends GVRScript {
             String objName = pickedObject.getHitObject().getName();
             SkyObject obj = skyObjectList.get(Integer.parseInt(objName));
 
-            mActivity.loadWebPageForObject(obj.name);
+            mActivity.loadWebPageForObject(obj);
             webViewVisible = true;
-
 
             webViewObject.getTransform().setPosition(0f, 0f, 0f);
             webViewObject.getTransform().setRotationByAxis(0f, 0f, 0f, 1f);
             webViewObject.getTransform().setRotationByAxis(0f, 0f, 1f, 0f);
             webViewObject.getTransform().setRotationByAxis(0f, 1f, 0f, 0f);
             setObjectPosition(webViewObject, obj.ra - 20f, obj.dec, 12f);
-
 
             // only care about the first picked object
             break;

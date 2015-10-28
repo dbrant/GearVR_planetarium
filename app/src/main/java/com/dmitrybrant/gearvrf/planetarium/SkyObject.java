@@ -19,6 +19,7 @@ public class SkyObject {
     public static final int TYPE_STAR = 0;
     public static final int TYPE_PLANET = 1;
     public static final int TYPE_NEBULA = 2;
+    public static final int TYPE_OTHER = 3;
 
     // sorry...
     public int type;
