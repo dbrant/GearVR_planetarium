@@ -64,7 +64,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
                 }
             });
         } else {
-            RestBaseClient.getPage(Util.transformStarName(obj.name), new RestBaseClient.OnGetPageResult() {
+            RestBaseClient.getPage(Util.transformObjectName(obj.name), new RestBaseClient.OnGetPageResult() {
                 @Override
                 public void onSuccess(String pageContents) {
                     loadIntoWebView(pageContents);

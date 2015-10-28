@@ -40,7 +40,7 @@ public class PlanetLoader {
             addPlanet(context, objectList, jd, obsInfo, Planets.SUN, "gstar.jpg", R.string.sun);
             addPlanet(context, objectList, jd, obsInfo, Planets.LUNA, "moon.jpg", R.string.moon);
             addPlanet(context, objectList, jd, obsInfo, Planets.MERCURY, "mercurymap.jpg", R.string.mercury);
-            addPlanet(context, objectList, jd, obsInfo, Planets.VENUS, "venusmap.jpg", R.string.venus);
+            addPlanet(context, objectList, jd, obsInfo, Planets.VENUS, "venus.jpg", R.string.venus);
             addPlanet(context, objectList, jd, obsInfo, Planets.MARS, "mars_1k_color.jpg", R.string.mars);
             addPlanet(context, objectList, jd, obsInfo, Planets.JUPITER, "jupiter.jpg", R.string.jupiter);
             addPlanet(context, objectList, jd, obsInfo, Planets.SATURN, "saturn.jpg", R.string.saturn);

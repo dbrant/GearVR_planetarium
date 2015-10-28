@@ -50,9 +50,13 @@ public class Util {
         return ret;
     }
 
-    public static String transformStarName(String origName) {
+    public static String transformObjectName(String origName) {
         String name = origName;
         name = " " + name + " ";
+
+        // wikify certain names
+        name = name.replace("Mercury", "Mercury (planet)");
+
         // convert Bayer designations
         name = name.replace(" ALF", "Alpha");
         name = name.replace(" BET", "Beta");
