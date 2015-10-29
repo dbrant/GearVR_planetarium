@@ -1,4 +1,4 @@
-/* Copyright 2015 Copyright 2015 Dmitry Brant
+/* Copyright 2015 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.dmitrybrant.gearvrf.planetarium;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;

@@ -15,8 +15,6 @@
 
 package com.dmitrybrant.gearvrf.planetarium;
 
-import com.mhuss.Util.Str;
-
 public class Util {
     public static final String TAG = "Util";
 

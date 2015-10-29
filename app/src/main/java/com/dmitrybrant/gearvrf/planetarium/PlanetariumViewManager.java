@@ -17,6 +17,10 @@ package com.dmitrybrant.gearvrf.planetarium;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.opengl.GLES10;
+import android.opengl.GLES10Ext;
+import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.os.Environment;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -49,6 +53,7 @@ import org.gearvrf.animation.GVRAnimationEngine;
 import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
 import org.gearvrf.animation.GVRScaleAnimation;
+import org.gearvrf.scene_objects.GVRConeSceneObject;
 import org.gearvrf.scene_objects.GVRTextViewSceneObject;
 import org.gearvrf.scene_objects.GVRWebViewSceneObject;
 import org.gearvrf.utility.Log;
@@ -211,6 +216,18 @@ public class PlanetariumViewManager extends GVRScript {
                     ringObj.getTransform().rotateByAxis(90f, 1f, 0f, 0f);
                     ringObj.getRenderData().setDepthTest(true);
                     */
+
+                    GVRMesh ringMesh = createRingMesh(gvrContext, 5f, 6f, 0f, 2f * (float)Math.PI, 24);
+                    GVRSceneObject ringObj = new GVRSceneObject(gvrContext, ringMesh,
+                            gvrContext.loadTexture(new GVRAndroidResource(mContext, R.drawable.saturn_rings)));
+
+
+                    ringObj.getTransform().setPosition(5f, -5f, -5f);
+                    //ringObj.getTransform().rotateByAxis(15f, 1f, 0f, 0f);
+                    //ringObj.getRenderData().setDrawMode(GLES10.GL_TRIANGLE_STRIP);
+                    rootObject.addChildObject(ringObj);
+
+
                 }
 
             }
@@ -420,4 +437,99 @@ public class PlanetariumViewManager extends GVRScript {
                 0.0f, 0.0f, 0.0f));
     }
 
+
+    private GVRMesh createRingMesh(GVRContext context, float innerRadius, float outerRadius,
+                                float beginAngle, float endAngle, int nSections) {
+        float angle = endAngle - beginAngle;
+        GVRMesh mesh = new GVRMesh(context);
+        float[] vertices = new float[(nSections + 1) * 3 * 6];
+        float[] normals = new float[(nSections + 1) * 3 * 6];
+        float[] texCoords = new float[(nSections + 1) * 2 * 6];
+        char[] indices = new char[(nSections + 1) * 6];
+        int vIndex = 0;
+        int tIndex = 0;
+        int nIndex = 0;
+        int iIndex = 0;
+        int triangleIndex = 0;
+        for (int i = 0; i < nSections; i++)
+        {
+            float t = (float) i / (float) nSections;
+            float theta = beginAngle + t * angle;
+            float s = (float) Math.sin(theta);
+            float c = (float) Math.cos(theta);
+            float t1 = (float) (i + 1) / (float) nSections;
+            float theta1 = beginAngle + t1 * angle;
+            float s1 = (float) Math.sin(theta1);
+            float c1 = (float) Math.cos(theta1);
+
+            texCoords[tIndex++] = 0f;
+            texCoords[tIndex++] = 0f;
+            texCoords[tIndex++] = 1f;
+            texCoords[tIndex++] = 0f;
+            texCoords[tIndex++] = 1f;
+            texCoords[tIndex++] = 1f;
+
+            vertices[vIndex++] = c * innerRadius;
+            vertices[vIndex++] = s * innerRadius;
+            vertices[vIndex++] = 0f;
+            vertices[vIndex++] = c * outerRadius;
+            vertices[vIndex++] = s * outerRadius;
+            vertices[vIndex++] = 0f;
+            vertices[vIndex++] = c1 * outerRadius;
+            vertices[vIndex++] = s1 * outerRadius;
+            vertices[vIndex++] = 0f;
+
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 1f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 1f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 1f;
+
+            indices[iIndex++] = (char) (triangleIndex);
+            indices[iIndex++] = (char) (triangleIndex + 1);
+            indices[iIndex++] = (char) (triangleIndex + 2);
+            triangleIndex += 3;
+
+            texCoords[tIndex++] = 0f;
+            texCoords[tIndex++] = 0f;
+            texCoords[tIndex++] = 0f;
+            texCoords[tIndex++] = 1f;
+            texCoords[tIndex++] = 1f;
+            texCoords[tIndex++] = 1f;
+
+            vertices[vIndex++] = c * innerRadius;
+            vertices[vIndex++] = s * innerRadius;
+            vertices[vIndex++] = 0f;
+            vertices[vIndex++] = c1 * innerRadius;
+            vertices[vIndex++] = s1 * innerRadius;
+            vertices[vIndex++] = 0f;
+            vertices[vIndex++] = c1 * outerRadius;
+            vertices[vIndex++] = s1 * outerRadius;
+            vertices[vIndex++] = 0f;
+
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 1f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 1f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 0f;
+            normals[nIndex++] = 1f;
+
+            indices[iIndex++] = (char) (triangleIndex + 1);
+            indices[iIndex++] = (char) (triangleIndex);
+            indices[iIndex++] = (char) (triangleIndex + 2);
+            triangleIndex += 3;
+        }
+        mesh.setVertices(vertices);
+        mesh.setTexCoords(texCoords);
+        mesh.setNormals(normals);
+        mesh.setTriangles(indices);
+        return mesh;
+    }
 }
