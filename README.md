@@ -15,8 +15,9 @@ Features:
 
 To do:
 * Proper lighting from the Sun, to create correct phases of Moon and planets.
-* Rings of Saturn.
+* Rings on Neptune.
 * Moons of other planets.
+* Tilt of other planets.
 * Constellation lines / borders.
 * Milky Way background.
 * More Messier objects.

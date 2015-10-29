@@ -210,27 +210,26 @@ public class PlanetariumViewManager extends GVRScript {
 
                     ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
                     ringObj.getRenderData().setDepthTest(true);
+                    ringObj.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET + 1);
                     sobj.getChildByIndex(0).getChildByIndex(0).getRenderData().setDepthTest(true);
                     sobj.getChildByIndex(0).getChildByIndex(0).addChildObject(ringObj);
                     sobj.getTransform().rotateByAxis(-20f, 1f, 0f, 0f);
                 } else if (obj.name.equals("Uranus")) {
                     // put a ring on it
-                    /*
                     GVRMesh ringMesh = RingMesh.createRingMesh(gvrContext, 1.5f, 2.0f, 32);
                     GVRSceneObject ringObj = new GVRSceneObject(gvrContext, new FutureWrapper<>(ringMesh),
                             gvrContext.loadFutureTexture(new GVRAndroidResource(mContext, R.drawable.uranus_rings)));
 
                     ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
                     ringObj.getRenderData().setDepthTest(true);
+                    ringObj.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET + 1);
                     sobj.getChildByIndex(0).getChildByIndex(0).getRenderData().setDepthTest(true);
                     sobj.getChildByIndex(0).getChildByIndex(0).addChildObject(ringObj);
                     sobj.getTransform().rotateByAxis(20f, 1f, 0f, 0f);
-                    */
                 }
 
             }
         }
-
 
     }
 
