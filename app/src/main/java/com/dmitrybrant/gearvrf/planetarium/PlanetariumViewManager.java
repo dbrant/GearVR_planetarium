@@ -159,12 +159,18 @@ public class PlanetariumViewManager extends GVRScript {
 
         genericQuadMesh = gvrContext.createQuad(10f, 10f);
 
-        Future<GVRTexture> futureTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star3));
+        GVRMesh starMesh = new GVRMesh(gvrContext);
+        starMesh.setVertices(new float[]{ -5f, 0f, 0f, 0f, 10f, 0f, 5f, 0f, 0f });
+        starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
+        starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
+        starMesh.setTriangles(new char[]{ 0, 2, 1 });
+
+        Future<GVRTexture> starTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star4));
         GVRMaterial[] starMaterial = new GVRMaterial[10];
         float colorVal = 0f, colorInc = 0.9f / (float) starMaterial.length;
         for (int i = 0; i < starMaterial.length; i++) {
             starMaterial[i] = new GVRMaterial(gvrContext);
-            starMaterial[i].setMainTexture(futureTex);
+            starMaterial[i].setMainTexture(starTex);
             float c = 0.1f + colorVal;
             colorVal += colorInc;
             starMaterial[i].setColor(c, c, c * 0.90f);
@@ -178,7 +184,7 @@ public class PlanetariumViewManager extends GVRScript {
                 if (matIndex < 0) { matIndex = 0; }
                 if (matIndex >= starMaterial.length) { matIndex = starMaterial.length - 1; }
 
-                GVRSceneObject sobj = new GVRSceneObject(gvrContext, genericQuadMesh);
+                GVRSceneObject sobj = new GVRSceneObject(gvrContext, starMesh);
                 sobj.getRenderData().setMaterial(starMaterial[matIndex]);
                 sobj.getRenderData().setDepthTest(false);
 
@@ -216,7 +222,7 @@ public class PlanetariumViewManager extends GVRScript {
                     sobj.getTransform().rotateByAxis(-20f, 1f, 0f, 0f);
                 } else if (obj.name.equals("Uranus")) {
                     // put a ring on it
-                    GVRMesh ringMesh = RingMesh.createRingMesh(gvrContext, 1.5f, 2.0f, 32);
+                    GVRMesh ringMesh = RingMesh.createRingMesh(gvrContext, 1.3f, 1.6f, 32);
                     GVRSceneObject ringObj = new GVRSceneObject(gvrContext, new FutureWrapper<>(ringMesh),
                             gvrContext.loadFutureTexture(new GVRAndroidResource(mContext, R.drawable.uranus_rings)));
 
@@ -230,12 +236,12 @@ public class PlanetariumViewManager extends GVRScript {
 
             }
         }
-
     }
 
     @Override
     public void onStep() {
         boolean havePicked = false;
+
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
             try {
                 SkyObject obj = skyObjectList.get(Integer.parseInt(pickedObject.getHitObject().getName()));
