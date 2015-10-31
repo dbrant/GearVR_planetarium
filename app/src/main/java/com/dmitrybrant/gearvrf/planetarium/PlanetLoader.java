@@ -32,8 +32,8 @@ public class PlanetLoader {
     public static void loadPlanets(GVRContext context, List<SkyObject> objectList) {
         try {
             Calendar calendar = Calendar.getInstance();
-            AstroDate date = new AstroDate(calendar.get(Calendar.DAY_OF_MONTH),
-                    calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+            AstroDate date = new AstroDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
             ObsInfo obsInfo = new ObsInfo();
             double jd = date.jd();
 

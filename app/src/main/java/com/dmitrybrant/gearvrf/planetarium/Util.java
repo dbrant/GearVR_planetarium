@@ -94,9 +94,9 @@ public class Util {
         name = name.replace(" Cae ", " Caeli");
         name = name.replace(" Cam ", " Camelopardalis");
         name = name.replace(" Cnc ", " Cancri");
-        name = name.replace(" CVn ", " Canum");
-        name = name.replace(" CMa ", " Canis");
-        name = name.replace(" CMi ", " Canis");
+        name = name.replace(" CVn ", " Canum Venaticorum");
+        name = name.replace(" CMa ", " Canis Majoris");
+        name = name.replace(" CMi ", " Canis Minoris");
         name = name.replace(" Cap ", " Capricorni");
         name = name.replace(" Car ", " Carinae");
         name = name.replace(" Cas ", " Cassiopeiae");
@@ -107,8 +107,8 @@ public class Util {
         name = name.replace(" Cir ", " Circini");
         name = name.replace(" Col ", " Columbae");
         name = name.replace(" Com ", " Comae");
-        name = name.replace(" CrA ", " Coronae");
-        name = name.replace(" CrB ", " Coronae");
+        name = name.replace(" CrA ", " Coronae Australis");
+        name = name.replace(" CrB ", " Coronae Borealis");
         name = name.replace(" Crv ", " Corvi");
         name = name.replace(" Crt ", " Crateris");
         name = name.replace(" Cru ", " Crucis");
@@ -128,7 +128,7 @@ public class Util {
         name = name.replace(" Ind ", " Indi");
         name = name.replace(" Lac ", " Lacertae");
         name = name.replace(" Leo ", " Leonis");
-        name = name.replace(" LMi ", " Leonis");
+        name = name.replace(" LMi ", " Leonis Minoris");
         name = name.replace(" Lep ", " Leporis");
         name = name.replace(" Lib ", " Librae");
         name = name.replace(" Lup ", " Lupi");
@@ -148,7 +148,7 @@ public class Util {
         name = name.replace(" Phe ", " Phoenicis");
         name = name.replace(" Pic ", " Pictoris");
         name = name.replace(" Psc ", " Piscium");
-        name = name.replace(" PsA ", " Piscis");
+        name = name.replace(" PsA ", " Piscis Austrini");
         name = name.replace(" Pup ", " Puppis");
         name = name.replace(" Pyx ", " Pyxidis");
         name = name.replace(" Ret ", " Reticuli");
@@ -162,10 +162,10 @@ public class Util {
         name = name.replace(" Tau ", " Tauri");
         name = name.replace(" Tel ", " Telescopii");
         name = name.replace(" Tri ", " Trianguli");
-        name = name.replace(" TrA ", " Trianguli");
+        name = name.replace(" TrA ", " Trianguli Australis");
         name = name.replace(" Tuc ", " Tucanae");
-        name = name.replace(" UMa ", " Ursae");
-        name = name.replace(" UMi ", " Ursae");
+        name = name.replace(" UMa ", " Ursae Majoris");
+        name = name.replace(" UMi ", " Ursae Minoris");
         name = name.replace(" Vel ", " Velorum");
         name = name.replace(" Vir ", " Virginis");
         name = name.replace(" Vol ", " Volantis");

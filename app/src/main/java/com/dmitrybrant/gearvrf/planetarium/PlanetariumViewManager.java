@@ -134,7 +134,7 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.getMainCameraRig().addChildObject(headTracker);
 
         // text view...
-        textView = new GVRTextViewSceneObject(gvrContext, mActivity);
+        textView = new GVRTextViewSceneObject(gvrContext, mActivity, 4f, 2f, "");
         textView.getTransform().setPosition(0.0f, 1.5f, -10.0f);
         textView.setTextSize(textView.getTextSize());
         textView.setText("");
@@ -207,7 +207,7 @@ public class PlanetariumViewManager extends GVRScript {
                 GVRSceneObject sobj = addPlanetObject(rootObject, obj, i);
                 if (obj.name.equals("Sun")) {
                     // let there be light
-                    mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
+                    //mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
                 } else if (obj.name.equals("Saturn")) {
                     // put a ring on it
                     GVRMesh ringMesh = RingMesh.createRingMesh(gvrContext, 1.5f, 2.3f, 32);
