@@ -33,6 +33,7 @@ public class NebulaLoader {
         addNebula(context, objectList, R.drawable.m51, Util.hmsToDec(13f, 30f, 0f), Util.dmsToDec(47f, 11f, 0f), 5f, R.string.m51);
         addNebula(context, objectList, R.drawable.m57, Util.hmsToDec(18f, 53.6f, 0f), Util.dmsToDec(33f, 2f, 0f), 10f, R.string.m57);
         addNebula(context, objectList, R.drawable.m101, Util.hmsToDec(14f, 3.2f, 0f), Util.dmsToDec(54f, 21f, 0f), 5f, R.string.m101);
+        addNebula(context, objectList, R.drawable.m104, Util.hmsToDec(12f, 39f, 59.4f), Util.dmsToDec(-11f, 37f, 23f), 5f, R.string.m104);
         addNebula(context, objectList, R.drawable.etacarinae, Util.hmsToDec(10f, 45f, 3.591f), Util.dmsToDec(-59f, 41f, 4.26f), 5f, R.string.eta_carinae);
     }
 
