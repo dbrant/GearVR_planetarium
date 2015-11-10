@@ -17,6 +17,7 @@ package com.dmitrybrant.gearvrf.planetarium;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.opengl.GLES20;
 import android.os.Environment;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -36,12 +37,14 @@ import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRLight;
 import org.gearvrf.GVRMaterial;
+import org.gearvrf.GVRMaterialShaderId;
 import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScreenshotCallback;
 import org.gearvrf.GVRScript;
+import org.gearvrf.GVRStockMaterialShaderId;
 import org.gearvrf.GVRTexture;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
@@ -236,6 +239,47 @@ public class PlanetariumViewManager extends GVRScript {
 
             }
         }
+
+
+
+
+
+
+
+
+
+        float[] vertices = new float[10 * 3];
+        char[] indices = new char[10];
+
+        GVRMesh asterismMesh = new GVRMesh(gvrContext);
+        for (int i =0; i < 10; i++) {
+            vertices[i * 3] = rootObject.getChildren().get(i + 100).getTransform().getPositionX();
+            vertices[i * 3 + 1] = rootObject.getChildren().get(i + 100).getTransform().getPositionY();
+            vertices[i * 3 + 2] = rootObject.getChildren().get(i + 100).getTransform().getPositionZ();
+            indices[i] = (char)(i);
+        }
+
+        asterismMesh.setVertices(vertices);
+        asterismMesh.setIndices(indices);
+
+        SolidColorShader shader = new SolidColorShader(gvrContext);
+
+        GVRSceneObject asterismObj = new GVRSceneObject(gvrContext, asterismMesh);
+        GVRMaterial asterismMat = new GVRMaterial(gvrContext, shader.getShaderId());
+        asterismMat.setVec4(SolidColorShader.COLOR_KEY, 0.3f, 0.7f, 0.7f, 0.5f);
+        asterismObj.getRenderData().setMaterial(asterismMat);
+
+        //asterismObj.getRenderData().getMaterial().setColor(Color.MAGENTA);
+        //asterismObj.getRenderData().getMaterial().setAmbientColor(1f, 0f, 0f, 0.5f);
+        //asterismObj.getRenderData().getMaterial().setDiffuseColor(1f, 0f, 0f, 0.5f);
+        //asterismObj.getRenderData().getMaterial().setSpecularColor(1f, 0f, 0f, 0.5f);
+
+
+        //asterismObj.getRenderData().getMaterial().setOpacity(0.5f);
+        asterismObj.getRenderData().setDepthTest(false);
+        asterismObj.getRenderData().setDrawMode(GLES20.GL_LINE_STRIP);
+        rootObject.addChildObject(asterismObj);
+
     }
 
     @Override
