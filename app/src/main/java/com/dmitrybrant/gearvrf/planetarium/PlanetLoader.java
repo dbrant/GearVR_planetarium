@@ -21,13 +21,66 @@ import com.mhuss.AstroLib.ObsInfo;
 import com.mhuss.AstroLib.PlanetData;
 import com.mhuss.AstroLib.Planets;
 
+import org.gearvrf.FutureWrapper;
+import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
+import org.gearvrf.GVRLight;
+import org.gearvrf.GVRMesh;
+import org.gearvrf.GVRSceneObject;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
 public class PlanetLoader {
     public static final float DEFAULT_DISTANCE_PLANET = 50f;
+
+    public static GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name, int renderOrder, GVRLight light) throws IOException {
+        GVRSceneObject planetRevolutionObject = new GVRSceneObject(context);
+        obj.sceneObj = planetRevolutionObject;
+
+        GVRSceneObject planetRotationObject = new GVRSceneObject(context);
+        planetRevolutionObject.addChildObject(planetRotationObject);
+
+        GVRSceneObject planetMeshObject = new GVRSceneObject(context,
+                new GVRAndroidResource(context, "sphere.obj"),
+                new GVRAndroidResource(context, obj.texName));
+
+        planetRotationObject.addChildObject(planetMeshObject);
+        planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
+        planetMeshObject.getRenderData().setDepthTest(false);
+        planetMeshObject.getRenderData().setRenderingOrder(renderOrder);
+        planetMeshObject.attachEyePointeeHolder();
+        planetMeshObject.setName(name);
+
+        // TODO: implement correct lighting
+        if (!obj.name.equals("Sun")) {
+            planetMeshObject.getRenderData().getMaterial().setColor(0.5f, 0.5f, 0.5f);
+            planetMeshObject.getRenderData().getMaterial().setOpacity(1.0f);
+            planetMeshObject.getRenderData().getMaterial().setAmbientColor(0.1f, 0.1f, 0.1f, 1.0f);
+            planetMeshObject.getRenderData().getMaterial().setDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+            planetMeshObject.getRenderData().setLight(light);
+            planetMeshObject.getRenderData().enableLight();
+        }
+
+        if (obj.name.equals("Moon")) {
+            planetMeshObject.getTransform().rotateByAxis(70f, 0f, 1f, 0f);
+        }
+        return planetRevolutionObject;
+    }
+
+    public static void addRings(GVRContext context, SkyObject obj, float innerRadius, float outerRadius, float rotation, int ringResId, int renderOrder) {
+        GVRMesh ringMesh = RingMesh.createRingMesh(context, innerRadius, outerRadius, 32);
+        GVRSceneObject ringObj = new GVRSceneObject(context, new FutureWrapper<>(ringMesh),
+                context.loadFutureTexture(new GVRAndroidResource(context, ringResId)));
+
+        ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
+        ringObj.getRenderData().setDepthTest(true);
+        ringObj.getRenderData().setRenderingOrder(renderOrder);
+        obj.sceneObj.getChildByIndex(0).getChildByIndex(0).getRenderData().setDepthTest(true);
+        obj.sceneObj.getChildByIndex(0).getChildByIndex(0).addChildObject(ringObj);
+        obj.sceneObj.getTransform().rotateByAxis(rotation, 1f, 0f, 0f);
+    }
 
     public static void loadPlanets(GVRContext context, List<SkyObject> objectList) {
         try {

@@ -22,13 +22,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.concurrent.Future;
 
+import org.gearvrf.GVRAndroidResource;
+import org.gearvrf.GVRContext;
+import org.gearvrf.GVRMaterial;
+import org.gearvrf.GVRMesh;
+import org.gearvrf.GVRSceneObject;
+import org.gearvrf.GVRTexture;
 import org.gearvrf.utility.Log;
 
-public class StarReader {
-    public static final String TAG = "StarReader";
+public class StarLoader {
+    private static final String TAG = "StarLoader";
+    public static final float MAX_STAR_MAGNITUDE = 4.5f;
 
-    public static void loadStars(Context context, List<SkyObject> starList) {
+    private static GVRMesh starMesh;
+    private static GVRMaterial[] starMaterials;
+
+    public GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
+        initMaterials(context);
+        int matIndex = (int) (starMaterials.length - obj.mag * ((float) starMaterials.length / MAX_STAR_MAGNITUDE));
+        if (matIndex < 0) {
+            matIndex = 0;
+        }
+        if (matIndex >= starMaterials.length) {
+            matIndex = starMaterials.length - 1;
+        }
+        GVRSceneObject sobj = new GVRSceneObject(context, starMesh);
+        obj.sceneObj = sobj;
+        sobj.getRenderData().setMaterial(starMaterials[matIndex]);
+        sobj.getRenderData().setDepthTest(false);
+        float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
+        if (scale < 1f) {
+            scale = 1f;
+        }
+        obj.initialScale = scale;
+        sobj.getTransform().setScale(scale, scale, scale);
+        sobj.attachEyePointeeHolder();
+        sobj.setName(name);
+        return sobj;
+    }
+
+    public void loadStars(Context context, List<SkyObject> starList) {
         InputStream instream = null;
         try {
             Log.d(TAG, "Loading stars...");
@@ -77,14 +112,11 @@ public class StarReader {
             while ((line = buffreader.readLine()) != null) {
                 lineArr = line.split(":");
                 int index = Integer.parseInt(lineArr[0]);
-
                 for (SkyObject star : starList) {
                     if (star.hipNum == index) {
-                        star.name = line; //lineArr[1];
-                        Asterisms.addStar(star);
+                        star.name = line;
                     }
                 }
-
             }
         } catch (IOException e) {
             Log.e(TAG, "Failed to read star names.", e);
@@ -98,4 +130,24 @@ public class StarReader {
         }
     }
 
+    private void initMaterials(GVRContext context) {
+        if (starMesh != null) {
+            return;
+        }
+        starMesh = new GVRMesh(context);
+        starMesh.setVertices(new float[]{-5f, -4.5f, 0f, 0f, 5.5f, 0f, 5f, -4.5f, 0f});
+        starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
+        starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
+        starMesh.setIndices(new char[]{0, 2, 1});
+        Future<GVRTexture> starTexture = context.loadFutureTexture(new GVRAndroidResource(context, R.drawable.star4));
+        starMaterials = new GVRMaterial[10];
+        float colorVal = 0f, colorInc = 0.9f / (float) starMaterials.length;
+        for (int i = 0; i < starMaterials.length; i++) {
+            starMaterials[i] = new GVRMaterial(context);
+            starMaterials[i].setMainTexture(starTexture);
+            float c = 0.1f + colorVal;
+            colorVal += colorInc;
+            starMaterials[i].setColor(c, c, c * 0.90f);
+        }
+    }
 }

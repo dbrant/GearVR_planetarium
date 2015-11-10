@@ -17,7 +17,6 @@ package com.dmitrybrant.gearvrf.planetarium;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.opengl.GLES20;
 import android.os.Environment;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -30,22 +29,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.gearvrf.FutureWrapper;
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRLight;
-import org.gearvrf.GVRMaterial;
-import org.gearvrf.GVRMaterialShaderId;
-import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScreenshotCallback;
 import org.gearvrf.GVRScript;
-import org.gearvrf.GVRStockMaterialShaderId;
-import org.gearvrf.GVRTexture;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
@@ -64,7 +57,6 @@ public class PlanetariumViewManager extends GVRScript {
     private static final int RENDER_ORDER_ASTERISM = 1000;
     private static final int RENDER_ORDER_BACKGROUND = 0;
 
-    private static final float MAX_STAR_MAGNITUDE = 4.5f;
     private static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private MainActivity mActivity;
@@ -79,14 +71,10 @@ public class PlanetariumViewManager extends GVRScript {
     private List<GVRAnimation> continuousAnimationList = new ArrayList<>();
     private List<GVRAnimation> unzoomAnimationList = new ArrayList<>();
 
-    private GVRMesh genericQuadMesh;
     private GVRTextViewSceneObject textView;
-
     private GVRWebViewSceneObject webViewObject;
     private boolean webViewVisible;
     private boolean webViewAdded;
-
-    private GVRLight mLight;
 
     PlanetariumViewManager(MainActivity activity) {
         mActivity = activity;
@@ -108,8 +96,12 @@ public class PlanetariumViewManager extends GVRScript {
         skyObjectList.addAll(planetObjectList);
         NebulaLoader.loadNebulae(mContext, skyObjectList);
         OtherObjLoader.loadObjects(skyObjectList);
-        Asterisms.loadAsterisms(mActivity);
-        StarReader.loadStars(mActivity, skyObjectList);
+
+        AsterismLoader asterismLoader = new AsterismLoader();
+        asterismLoader.loadAsterisms(mActivity);
+
+        StarLoader starLoader = new StarLoader();
+        starLoader.loadStars(mActivity, skyObjectList);
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
             @Override
@@ -158,122 +150,57 @@ public class PlanetariumViewManager extends GVRScript {
         webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
 
         // light!
-        mLight = new GVRLight(gvrContext);
+        GVRLight mLight = new GVRLight(gvrContext);
         mLight.setAmbientIntensity(0.5f, 0.5f, 0.5f, 1.0f);
         mLight.setDiffuseIntensity(1.0f, 1.0f, 1.0f, 1.0f);
-
-
-        genericQuadMesh = gvrContext.createQuad(10f, 10f);
-
-        GVRMesh starMesh = new GVRMesh(gvrContext);
-        starMesh.setVertices(new float[]{ -5f, -4.5f, 0f, 0f, 5.5f, 0f, 5f, -4.5f, 0f });
-        starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
-        starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
-        starMesh.setTriangles(new char[]{ 0, 2, 1 });
-
-        Future<GVRTexture> starTex = gvrContext.loadFutureTexture(new GVRAndroidResource(gvrContext, R.drawable.star4));
-        GVRMaterial[] starMaterial = new GVRMaterial[10];
-        float colorVal = 0f, colorInc = 0.9f / (float) starMaterial.length;
-        for (int i = 0; i < starMaterial.length; i++) {
-            starMaterial[i] = new GVRMaterial(gvrContext);
-            starMaterial[i].setMainTexture(starTex);
-            float c = 0.1f + colorVal;
-            colorVal += colorInc;
-            starMaterial[i].setColor(c, c, c * 0.90f);
-        }
 
         for (int i = 0; i < skyObjectList.size(); i++) {
             SkyObject obj = skyObjectList.get(i);
             if (obj.type == SkyObject.TYPE_STAR) {
 
-                Asterisms.addStar(obj);
-
-                if (obj.mag <= MAX_STAR_MAGNITUDE) {
-                    int matIndex = (int) (starMaterial.length - obj.mag * ((float) starMaterial.length / MAX_STAR_MAGNITUDE));
-                    if (matIndex < 0) {
-                        matIndex = 0;
-                    }
-                    if (matIndex >= starMaterial.length) {
-                        matIndex = starMaterial.length - 1;
-                    }
-
-                    GVRSceneObject sobj = new GVRSceneObject(gvrContext, starMesh);
-                    obj.sceneObj = sobj;
-                    sobj.getRenderData().setMaterial(starMaterial[matIndex]);
-                    sobj.getRenderData().setDepthTest(false);
-                    sobj.getRenderData().setRenderingOrder(RENDER_ORDER_STAR);
-
-                    float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
-                    if (scale < 1f) {
-                        scale = 1f;
-                    }
-                    obj.initialScale = scale;
-                    sobj.getTransform().setScale(scale, scale, scale);
+                asterismLoader.addStar(obj);
+                if (obj.mag <= StarLoader.MAX_STAR_MAGNITUDE) {
+                    GVRSceneObject sobj = starLoader.createSceneObject(gvrContext, obj, Integer.toString(i));
                     setObjectPosition(sobj, obj.ra, obj.dec, DEFAULT_DISTANCE_STAR);
-                    sobj.setName(Integer.toString(i));
-                    sobj.attachEyePointeeHolder();
+                    sobj.getRenderData().setRenderingOrder(RENDER_ORDER_STAR);
                     rootObject.addChildObject(sobj);
                 }
 
             } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
 
-                GVRSceneObject sobj = addNebulaObject(rootObject, obj);
-                obj.sceneObj = sobj;
-                sobj.setName(Integer.toString(i));
+                GVRSceneObject sobj = NebulaLoader.createSceneObject(mContext, obj, Integer.toString(i));
+                rootObject.addChildObject(sobj);
+                sobj.getRenderData().setRenderingOrder(RENDER_ORDER_BACKGROUND);
+                setObjectPosition(sobj, obj.ra, obj.dec, obj.dist);
 
             } else if (obj.type == SkyObject.TYPE_PLANET) {
 
-                GVRSceneObject sobj = addPlanetObject(rootObject, obj, i);
-                obj.sceneObj = sobj;
+                GVRSceneObject sobj = PlanetLoader.createSceneObject(gvrContext, obj, Integer.toString(i), RENDER_ORDER_PLANET - i, mLight);
+                rootObject.addChildObject(sobj);
+                setObjectPosition(sobj, obj.ra, obj.dec, PlanetLoader.DEFAULT_DISTANCE_PLANET);
+
+                if (!obj.name.equals("Moon")) {
+                    animateCounterClockwise(sobj.getChildByIndex(0), 10f);
+                }
+
                 if (obj.name.equals("Sun")) {
                     // let there be light
                     //mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
                 } else if (obj.name.equals("Saturn")) {
                     // put a ring on it
-                    GVRMesh ringMesh = RingMesh.createRingMesh(gvrContext, 1.5f, 2.3f, 32);
-                    GVRSceneObject ringObj = new GVRSceneObject(gvrContext, new FutureWrapper<>(ringMesh),
-                            gvrContext.loadFutureTexture(new GVRAndroidResource(mContext, R.drawable.saturn_rings)));
-
-                    ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
-                    ringObj.getRenderData().setDepthTest(true);
-                    ringObj.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET + 1);
-                    sobj.getChildByIndex(0).getChildByIndex(0).getRenderData().setDepthTest(true);
-                    sobj.getChildByIndex(0).getChildByIndex(0).addChildObject(ringObj);
-                    sobj.getTransform().rotateByAxis(-20f, 1f, 0f, 0f);
+                    PlanetLoader.addRings(gvrContext, obj, 1.5f, 2.3f, -20f, R.drawable.saturn_rings, RENDER_ORDER_PLANET + 1);
                 } else if (obj.name.equals("Uranus")) {
                     // put a ring on it
-                    GVRMesh ringMesh = RingMesh.createRingMesh(gvrContext, 1.3f, 1.6f, 32);
-                    GVRSceneObject ringObj = new GVRSceneObject(gvrContext, new FutureWrapper<>(ringMesh),
-                            gvrContext.loadFutureTexture(new GVRAndroidResource(mContext, R.drawable.uranus_rings)));
-
-                    ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
-                    ringObj.getRenderData().setDepthTest(true);
-                    ringObj.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET + 1);
-                    sobj.getChildByIndex(0).getChildByIndex(0).getRenderData().setDepthTest(true);
-                    sobj.getChildByIndex(0).getChildByIndex(0).addChildObject(ringObj);
-                    sobj.getTransform().rotateByAxis(20f, 1f, 0f, 0f);
+                    PlanetLoader.addRings(gvrContext, obj, 1.3f, 1.6f, 20f, R.drawable.uranus_rings, RENDER_ORDER_PLANET + 1);
                 }
-
             }
         }
 
-
-
-        SolidColorShader shader = new SolidColorShader(gvrContext);
-        GVRMaterial asterismMat = new GVRMaterial(gvrContext, shader.getShaderId());
-        asterismMat.setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
-
-        for (Asterisms.Asterism asterism : Asterisms.getAsterisms()) {
-            GVRMesh mesh = asterism.createMesh(gvrContext);
-            GVRSceneObject asterismObj = new GVRSceneObject(gvrContext, mesh);
-            asterismObj.getRenderData().setMaterial(asterismMat);
-            asterismObj.getRenderData().setDepthTest(false);
+        for (Asterism asterism : asterismLoader.getAsterisms()) {
+            GVRSceneObject asterismObj = asterism.createSceneObject(gvrContext);
             asterismObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM);
-            asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
             rootObject.addChildObject(asterismObj);
         }
-
-
 
     }
 
@@ -358,55 +285,6 @@ public class PlanetariumViewManager extends GVRScript {
         obj.getTransform().rotateByAxisWithPivot((float) ra, 0, 1, 0, 0, 0, 0);
         obj.getTransform().rotateByAxisWithPivot((float) dec, (float) Math.cos(Math.toRadians(ra)),
                 0, (float) -Math.sin(Math.toRadians(ra)), 0, 0, 0);
-    }
-
-    private GVRSceneObject addPlanetObject(GVRSceneObject parentObj, SkyObject obj, int index) throws IOException {
-        GVRSceneObject planetRevolutionObject = new GVRSceneObject(mContext);
-        setObjectPosition(planetRevolutionObject, obj.ra, obj.dec, PlanetLoader.DEFAULT_DISTANCE_PLANET);
-        parentObj.addChildObject(planetRevolutionObject);
-
-        GVRSceneObject planetRotationObject = new GVRSceneObject(mContext);
-        planetRevolutionObject.addChildObject(planetRotationObject);
-
-        GVRSceneObject planetMeshObject = new GVRSceneObject(mContext,
-                new GVRAndroidResource(mContext, "sphere.obj"),
-                new GVRAndroidResource(mContext, obj.texName));
-
-        planetRotationObject.addChildObject(planetMeshObject);
-        planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
-        planetMeshObject.getRenderData().setRenderingOrder(RENDER_ORDER_PLANET - index);
-        planetMeshObject.getRenderData().setDepthTest(false);
-
-        if (!obj.name.equals("Sun")) {
-            planetMeshObject.getRenderData().getMaterial().setColor(0.5f, 0.5f, 0.5f);
-            planetMeshObject.getRenderData().getMaterial().setOpacity(1.0f);
-            planetMeshObject.getRenderData().getMaterial().setAmbientColor(0.1f, 0.1f, 0.1f, 1.0f);
-            planetMeshObject.getRenderData().getMaterial().setDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-            planetMeshObject.getRenderData().setLight(mLight);
-            planetMeshObject.getRenderData().enableLight();
-        }
-
-        if (obj.name.equals("Moon")) {
-            planetMeshObject.getTransform().rotateByAxis(70f, 0f, 1f, 0f);
-        } else {
-            animateCounterClockwise(planetRotationObject, 10f);
-        }
-
-        planetMeshObject.attachEyePointeeHolder();
-        planetMeshObject.setName(Integer.toString(index));
-        return planetRevolutionObject;
-    }
-
-    private GVRSceneObject addNebulaObject(GVRSceneObject parentObj, SkyObject obj) throws IOException {
-        GVRSceneObject sobj = new GVRSceneObject(mContext, genericQuadMesh,
-                mContext.loadTexture(new GVRAndroidResource(mContext, obj.texResId)));
-        parentObj.addChildObject(sobj);
-        sobj.getRenderData().setRenderingOrder(RENDER_ORDER_BACKGROUND);
-        sobj.getRenderData().setDepthTest(false);
-        sobj.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
-        setObjectPosition(sobj, obj.ra, obj.dec, obj.dist);
-        sobj.attachEyePointeeHolder();
-        return sobj;
     }
 
     public boolean dispatchKeyEvent(KeyEvent event) {

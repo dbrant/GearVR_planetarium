@@ -15,12 +15,31 @@
 
 package com.dmitrybrant.gearvrf.planetarium;
 
+import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
+import org.gearvrf.GVRMesh;
+import org.gearvrf.GVRSceneObject;
 
 import java.util.List;
 
 public class NebulaLoader {
     private static final float DEFAULT_DISTANCE_NEBULA = 550f;
+
+    private static GVRMesh nebulaMesh;
+
+    public static GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
+        if (nebulaMesh == null) {
+            nebulaMesh = context.createQuad(10f, 10f);
+        }
+        GVRSceneObject sobj = new GVRSceneObject(context, nebulaMesh,
+                context.loadTexture(new GVRAndroidResource(context, obj.texResId)));
+        obj.sceneObj = sobj;
+        sobj.getRenderData().setDepthTest(false);
+        sobj.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
+        sobj.attachEyePointeeHolder();
+        sobj.setName(name);
+        return sobj;
+    }
 
     public static void loadNebulae(GVRContext context, List<SkyObject> objectList) {
         addNebula(context, objectList, R.drawable.m1, Util.hmsToDec(5f, 34f, 31.94f), Util.dmsToDec(22f, 0f, 52.2f), 5f, R.string.m1);
