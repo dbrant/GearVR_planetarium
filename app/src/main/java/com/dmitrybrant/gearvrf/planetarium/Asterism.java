@@ -96,11 +96,15 @@ public class Asterism {
     }
 
     public float getCenterRa() {
-        double ra = 0.0;
+        double xavg = 0.0;
+        double yavg = 0.0;
         for (AsterismNode node : nodes) {
-            ra += node.getStar().ra;
+            xavg += Math.cos(Math.toRadians(node.getStar().ra));
+            yavg += Math.sin(Math.toRadians(node.getStar().ra));
         }
-        return (float) (ra / nodes.size());
+        xavg /= nodes.size();
+        yavg /= nodes.size();
+        return (float) Math.toDegrees(Math.atan2(yavg, xavg));
     }
 
     public float getCenterDec() {

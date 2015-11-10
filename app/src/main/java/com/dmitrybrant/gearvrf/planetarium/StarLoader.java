@@ -86,6 +86,7 @@ public class StarLoader {
 
                 s.mag = Float.parseFloat(lineArr[4]);
                 s.className = lineArr[5];
+                s.name = "HIP " + s.hipNum;
 
                 // for converting to (x,y,z):
                 //s.x = (float) ((s.dist * Math.cos(s.dec)) * Math.cos(s.ra));
@@ -114,7 +115,7 @@ public class StarLoader {
                 int index = Integer.parseInt(lineArr[0]);
                 for (SkyObject star : starList) {
                     if (star.hipNum == index) {
-                        star.name = line;
+                        star.name = Util.transformStarName(lineArr[1]);
                     }
                 }
             }

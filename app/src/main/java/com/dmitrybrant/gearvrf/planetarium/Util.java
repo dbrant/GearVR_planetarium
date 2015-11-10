@@ -48,6 +48,13 @@ public class Util {
         return ret;
     }
 
+    public static void cleanupStarName(SkyObject obj) {
+        if (obj.name == null) {
+            obj.name = "HIP " + obj.hipNum;
+        }
+
+    }
+
     public static String bayerToGreek(String name) {
         name = name.replace("ALF", "Alpha");
         name = name.replace("BET", "Beta");
@@ -288,19 +295,21 @@ public class Util {
         return name;
     }
 
-    public static String transformObjectName(String origName) {
+    public static String transformStarName(String origName) {
         String name = origName.trim();
-
-        // wikify certain names
-        name = name.replace("Mercury", "Mercury (planet)");
-
         String[] nameArr = name.split("\\s+");
         if (nameArr.length == 2) {
             nameArr[0] = bayerToGreek(nameArr[0]);
             nameArr[1] = bayerToGenitive(nameArr[1]);
             name = nameArr[0] + " " + nameArr[1];
         }
+        return name;
+    }
 
+    public static String transformObjectName(String origName) {
+        String name = origName.trim();
+        // wikify certain names
+        name = name.replace("Mercury", "Mercury (planet)");
         return name;
     }
 }
