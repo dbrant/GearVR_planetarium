@@ -37,7 +37,7 @@ import org.gearvrf.utility.Log;
 public class Asterism {
     private static final String TAG = "Asterism";
     private static final float LABEL_WIDTH = 40f;
-    private static final int LABEL_COLOR = 0xff003050;
+    private static final int LABEL_COLOR = 0x80003050;
 
     private static GVRMaterial asterismMaterial;
 
@@ -82,12 +82,15 @@ public class Asterism {
         Rect bounds = new Rect();
         paint.getTextBounds(name, 0, name.length(), bounds);
 
-        Bitmap bmp = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+        Bitmap bmp = Bitmap.createBitmap(bounds.width() * 3 / 2, bounds.height() * 3 / 2, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bmp);
-        canvas.drawText(name, 0, bounds.height() - 1, paint);
+        canvas.drawText(name, bmp.getWidth() / 4, bmp.getHeight() * 3 / 4, paint);
+
+        final float labelWidthNormal = 120f;
+        float widthScale = (float) bounds.width() / labelWidthNormal;
 
         float aspect = (float) bounds.width() / (float) bounds.height();
-        GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH, LABEL_WIDTH / aspect), new GVRBitmapTexture(gvrContext, bmp));
+        GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH * widthScale, LABEL_WIDTH * widthScale / aspect), new GVRBitmapTexture(gvrContext, bmp));
         sobj.getRenderData().setDepthTest(false);
         return sobj;
     }
