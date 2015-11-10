@@ -106,6 +106,7 @@ public class PlanetariumViewManager extends GVRScript {
         skyObjectList.addAll(planetObjectList);
         NebulaLoader.loadNebulae(mContext, skyObjectList);
         OtherObjLoader.loadObjects(skyObjectList);
+        Asterisms.loadAsterisms(mActivity);
         StarReader.loadStars(mActivity, skyObjectList);
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
@@ -188,6 +189,7 @@ public class PlanetariumViewManager extends GVRScript {
                 if (matIndex >= starMaterial.length) { matIndex = starMaterial.length - 1; }
 
                 GVRSceneObject sobj = new GVRSceneObject(gvrContext, starMesh);
+                obj.sceneObj = sobj;
                 sobj.getRenderData().setMaterial(starMaterial[matIndex]);
                 sobj.getRenderData().setDepthTest(false);
 
@@ -199,15 +201,18 @@ public class PlanetariumViewManager extends GVRScript {
                 sobj.setName(Integer.toString(i));
                 sobj.attachEyePointeeHolder();
                 rootObject.addChildObject(sobj);
+                Asterisms.addStar(obj);
 
             } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
 
                 GVRSceneObject sobj = addNebulaObject(rootObject, obj);
+                obj.sceneObj = sobj;
                 sobj.setName(Integer.toString(i));
 
             } else if (obj.type == SkyObject.TYPE_PLANET) {
 
                 GVRSceneObject sobj = addPlanetObject(rootObject, obj, i);
+                obj.sceneObj = sobj;
                 if (obj.name.equals("Sun")) {
                     // let there be light
                     //mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
@@ -245,9 +250,6 @@ public class PlanetariumViewManager extends GVRScript {
 
 
 
-
-
-
         float[] vertices = new float[10 * 3];
         char[] indices = new char[10];
 
@@ -264,21 +266,38 @@ public class PlanetariumViewManager extends GVRScript {
 
         SolidColorShader shader = new SolidColorShader(gvrContext);
 
-        GVRSceneObject asterismObj = new GVRSceneObject(gvrContext, asterismMesh);
+        GVRSceneObject aObj = new GVRSceneObject(gvrContext, asterismMesh);
         GVRMaterial asterismMat = new GVRMaterial(gvrContext, shader.getShaderId());
         asterismMat.setVec4(SolidColorShader.COLOR_KEY, 0.3f, 0.7f, 0.7f, 0.5f);
-        asterismObj.getRenderData().setMaterial(asterismMat);
+        aObj.getRenderData().setMaterial(asterismMat);
 
-        //asterismObj.getRenderData().getMaterial().setColor(Color.MAGENTA);
-        //asterismObj.getRenderData().getMaterial().setAmbientColor(1f, 0f, 0f, 0.5f);
-        //asterismObj.getRenderData().getMaterial().setDiffuseColor(1f, 0f, 0f, 0.5f);
-        //asterismObj.getRenderData().getMaterial().setSpecularColor(1f, 0f, 0f, 0.5f);
+        aObj.getRenderData().setDepthTest(false);
+        aObj.getRenderData().setDrawMode(GLES20.GL_LINE_STRIP);
+        rootObject.addChildObject(aObj);
 
 
-        //asterismObj.getRenderData().getMaterial().setOpacity(0.5f);
-        asterismObj.getRenderData().setDepthTest(false);
-        asterismObj.getRenderData().setDrawMode(GLES20.GL_LINE_STRIP);
-        rootObject.addChildObject(asterismObj);
+
+
+
+
+        for (Asterisms.Asterism asterism : Asterisms.getAsterisms()) {
+
+            GVRMesh mesh = asterism.createMesh(gvrContext);
+            GVRSceneObject asterismObj = new GVRSceneObject(gvrContext, mesh);
+            asterismObj.getRenderData().setMaterial(asterismMat);
+            asterismObj.getRenderData().setDepthTest(false);
+            asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
+            rootObject.addChildObject(asterismObj);
+        }
+
+
+
+
+
+
+
+
+
 
     }
 

@@ -80,7 +80,8 @@ public class StarReader {
 
                 for (SkyObject star : starList) {
                     if (star.catIndex == index) {
-                        star.name = lineArr[1];
+                        star.name = line; //lineArr[1];
+                        Asterisms.addStar(star);
                     }
                 }
 
