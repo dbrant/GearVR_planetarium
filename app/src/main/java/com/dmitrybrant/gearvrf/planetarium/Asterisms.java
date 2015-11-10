@@ -59,7 +59,7 @@ public class Asterisms {
             GVRMesh mesh = new GVRMesh(context);
             for(AsterismNode node : segments) {
                 if (node.getStar() == null) {
-                    Log.w("foo", ">>>>>>>>>>>>>>>>>> orphan asterism node: " + node.getHipNum());
+                    Log.w("Asterisms", "Orphan asterism node: " + node.getHipNum());
                     continue;
                 }
                 vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionX();

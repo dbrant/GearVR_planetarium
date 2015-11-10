@@ -60,6 +60,8 @@ public class PlanetariumViewManager extends GVRScript {
     private static final String TAG = Log.tag(PlanetariumViewManager.class);
     private static final int RENDER_ORDER_UI = 100000;
     private static final int RENDER_ORDER_PLANET = 99900;
+    private static final int RENDER_ORDER_STAR = 2000;
+    private static final int RENDER_ORDER_ASTERISM = 1000;
     private static final int RENDER_ORDER_BACKGROUND = 0;
 
     private static final float MAX_STAR_MAGNITUDE = 4.5f;
@@ -164,7 +166,7 @@ public class PlanetariumViewManager extends GVRScript {
         genericQuadMesh = gvrContext.createQuad(10f, 10f);
 
         GVRMesh starMesh = new GVRMesh(gvrContext);
-        starMesh.setVertices(new float[]{ -5f, 0f, 0f, 0f, 10f, 0f, 5f, 0f, 0f });
+        starMesh.setVertices(new float[]{ -5f, -4.5f, 0f, 0f, 5.5f, 0f, 5f, -4.5f, 0f });
         starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
         starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
         starMesh.setTriangles(new char[]{ 0, 2, 1 });
@@ -199,6 +201,7 @@ public class PlanetariumViewManager extends GVRScript {
                     obj.sceneObj = sobj;
                     sobj.getRenderData().setMaterial(starMaterial[matIndex]);
                     sobj.getRenderData().setDepthTest(false);
+                    sobj.getRenderData().setRenderingOrder(RENDER_ORDER_STAR);
 
                     float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
                     if (scale < 1f) {
@@ -258,13 +261,14 @@ public class PlanetariumViewManager extends GVRScript {
 
         SolidColorShader shader = new SolidColorShader(gvrContext);
         GVRMaterial asterismMat = new GVRMaterial(gvrContext, shader.getShaderId());
-        asterismMat.setVec4(SolidColorShader.COLOR_KEY, 0.3f, 0.7f, 0.7f, 0.5f);
+        asterismMat.setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
 
         for (Asterisms.Asterism asterism : Asterisms.getAsterisms()) {
             GVRMesh mesh = asterism.createMesh(gvrContext);
             GVRSceneObject asterismObj = new GVRSceneObject(gvrContext, mesh);
             asterismObj.getRenderData().setMaterial(asterismMat);
             asterismObj.getRenderData().setDepthTest(false);
+            asterismObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM);
             asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
             rootObject.addChildObject(asterismObj);
         }
