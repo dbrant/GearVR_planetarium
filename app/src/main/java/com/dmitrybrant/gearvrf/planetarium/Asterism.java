@@ -15,12 +15,19 @@
 
 package com.dmitrybrant.gearvrf.planetarium;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.opengl.GLES20;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gearvrf.GVRBitmapTexture;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMesh;
@@ -29,6 +36,8 @@ import org.gearvrf.utility.Log;
 
 public class Asterism {
     private static final String TAG = "Asterism";
+    private static final float LABEL_WIDTH = 40f;
+    private static final int LABEL_COLOR = 0xff003050;
 
     private static GVRMaterial asterismMaterial;
 
@@ -44,7 +53,7 @@ public class Asterism {
 
     public Asterism(String line) throws IOException {
         String[] lineArr = line.split("\\s+");
-        name = lineArr[0];
+        name = Util.bayerToFullName(lineArr[0]);
         for (int i = 2; i < lineArr.length; i++) {
             int hipNum = Integer.parseInt(lineArr[i]);
             AsterismNode node = new AsterismNode(hipNum);
@@ -64,6 +73,39 @@ public class Asterism {
         asterismObj.getRenderData().setDepthTest(false);
         asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
         return asterismObj;
+    }
+
+    public GVRSceneObject createLabelObject(GVRContext gvrContext, Context context) {
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(LABEL_COLOR);
+        paint.setTextSize((int) (16 * context.getResources().getDisplayMetrics().density));
+        Rect bounds = new Rect();
+        paint.getTextBounds(name, 0, name.length(), bounds);
+
+        Bitmap bmp = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+        canvas.drawText(name, 0, bounds.height() - 1, paint);
+
+        float aspect = (float) bounds.width() / (float) bounds.height();
+        GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH, LABEL_WIDTH / aspect), new GVRBitmapTexture(gvrContext, bmp));
+        sobj.getRenderData().setDepthTest(false);
+        return sobj;
+    }
+
+    public float getCenterRa() {
+        double ra = 0.0;
+        for (AsterismNode node : nodes) {
+            ra += node.getStar().ra;
+        }
+        return (float) (ra / nodes.size());
+    }
+
+    public float getCenterDec() {
+        double dec = 0.0;
+        for (AsterismNode node : nodes) {
+            dec += node.getStar().dec;
+        }
+        return (float) (dec / nodes.size());
     }
 
     private GVRMesh createMesh(GVRContext context) {

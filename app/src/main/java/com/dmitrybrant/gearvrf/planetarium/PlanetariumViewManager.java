@@ -200,6 +200,11 @@ public class PlanetariumViewManager extends GVRScript {
             GVRSceneObject asterismObj = asterism.createSceneObject(gvrContext);
             asterismObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM);
             rootObject.addChildObject(asterismObj);
+
+            GVRSceneObject labelObj = asterism.createLabelObject(gvrContext, mActivity);
+            setObjectPosition(labelObj, asterism.getCenterRa(), asterism.getCenterDec(), DEFAULT_DISTANCE_STAR);
+            labelObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM + 1);
+            rootObject.addChildObject(labelObj);
         }
 
     }
