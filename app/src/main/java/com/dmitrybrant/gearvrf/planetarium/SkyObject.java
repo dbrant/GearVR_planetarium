@@ -31,7 +31,7 @@ public class SkyObject {
     public double dec;
     public float dist;
     public float mag;
-    public int catIndex;
+    public int hipNum;
     public String name;
     public String className;
 

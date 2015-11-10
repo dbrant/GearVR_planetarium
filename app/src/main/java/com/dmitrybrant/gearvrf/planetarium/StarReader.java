@@ -43,7 +43,7 @@ public class StarReader {
                 SkyObject s = new SkyObject();
                 starList.add(s);
                 s.type = SkyObject.TYPE_STAR;
-                s.catIndex = Integer.parseInt(lineArr[0]);
+                s.hipNum = Integer.parseInt(lineArr[0]);
 
                 s.ra = Double.parseDouble(lineArr[1]);
                 s.dec = Double.parseDouble(lineArr[2]);
@@ -79,7 +79,7 @@ public class StarReader {
                 int index = Integer.parseInt(lineArr[0]);
 
                 for (SkyObject star : starList) {
-                    if (star.catIndex == index) {
+                    if (star.hipNum == index) {
                         star.name = line; //lineArr[1];
                         Asterisms.addStar(star);
                     }

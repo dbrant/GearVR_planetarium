@@ -182,26 +182,35 @@ public class PlanetariumViewManager extends GVRScript {
 
         for (int i = 0; i < skyObjectList.size(); i++) {
             SkyObject obj = skyObjectList.get(i);
-            if (obj.type == SkyObject.TYPE_STAR && obj.mag <= MAX_STAR_MAGNITUDE) {
+            if (obj.type == SkyObject.TYPE_STAR) {
 
-                int matIndex = (int) (starMaterial.length - obj.mag * ((float) starMaterial.length / MAX_STAR_MAGNITUDE));
-                if (matIndex < 0) { matIndex = 0; }
-                if (matIndex >= starMaterial.length) { matIndex = starMaterial.length - 1; }
-
-                GVRSceneObject sobj = new GVRSceneObject(gvrContext, starMesh);
-                obj.sceneObj = sobj;
-                sobj.getRenderData().setMaterial(starMaterial[matIndex]);
-                sobj.getRenderData().setDepthTest(false);
-
-                float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
-                if (scale < 1f) { scale = 1f; }
-                obj.initialScale = scale;
-                sobj.getTransform().setScale(scale, scale, scale);
-                setObjectPosition(sobj, obj.ra, obj.dec, DEFAULT_DISTANCE_STAR);
-                sobj.setName(Integer.toString(i));
-                sobj.attachEyePointeeHolder();
-                rootObject.addChildObject(sobj);
                 Asterisms.addStar(obj);
+
+                if (obj.mag <= MAX_STAR_MAGNITUDE) {
+                    int matIndex = (int) (starMaterial.length - obj.mag * ((float) starMaterial.length / MAX_STAR_MAGNITUDE));
+                    if (matIndex < 0) {
+                        matIndex = 0;
+                    }
+                    if (matIndex >= starMaterial.length) {
+                        matIndex = starMaterial.length - 1;
+                    }
+
+                    GVRSceneObject sobj = new GVRSceneObject(gvrContext, starMesh);
+                    obj.sceneObj = sobj;
+                    sobj.getRenderData().setMaterial(starMaterial[matIndex]);
+                    sobj.getRenderData().setDepthTest(false);
+
+                    float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
+                    if (scale < 1f) {
+                        scale = 1f;
+                    }
+                    obj.initialScale = scale;
+                    sobj.getTransform().setScale(scale, scale, scale);
+                    setObjectPosition(sobj, obj.ra, obj.dec, DEFAULT_DISTANCE_STAR);
+                    sobj.setName(Integer.toString(i));
+                    sobj.attachEyePointeeHolder();
+                    rootObject.addChildObject(sobj);
+                }
 
             } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
 
@@ -247,41 +256,11 @@ public class PlanetariumViewManager extends GVRScript {
 
 
 
-
-
-
-        float[] vertices = new float[10 * 3];
-        char[] indices = new char[10];
-
-        GVRMesh asterismMesh = new GVRMesh(gvrContext);
-        for (int i =0; i < 10; i++) {
-            vertices[i * 3] = rootObject.getChildren().get(i + 100).getTransform().getPositionX();
-            vertices[i * 3 + 1] = rootObject.getChildren().get(i + 100).getTransform().getPositionY();
-            vertices[i * 3 + 2] = rootObject.getChildren().get(i + 100).getTransform().getPositionZ();
-            indices[i] = (char)(i);
-        }
-
-        asterismMesh.setVertices(vertices);
-        asterismMesh.setIndices(indices);
-
         SolidColorShader shader = new SolidColorShader(gvrContext);
-
-        GVRSceneObject aObj = new GVRSceneObject(gvrContext, asterismMesh);
         GVRMaterial asterismMat = new GVRMaterial(gvrContext, shader.getShaderId());
         asterismMat.setVec4(SolidColorShader.COLOR_KEY, 0.3f, 0.7f, 0.7f, 0.5f);
-        aObj.getRenderData().setMaterial(asterismMat);
-
-        aObj.getRenderData().setDepthTest(false);
-        aObj.getRenderData().setDrawMode(GLES20.GL_LINE_STRIP);
-        rootObject.addChildObject(aObj);
-
-
-
-
-
 
         for (Asterisms.Asterism asterism : Asterisms.getAsterisms()) {
-
             GVRMesh mesh = asterism.createMesh(gvrContext);
             GVRSceneObject asterismObj = new GVRSceneObject(gvrContext, mesh);
             asterismObj.getRenderData().setMaterial(asterismMat);
@@ -289,13 +268,6 @@ public class PlanetariumViewManager extends GVRScript {
             asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
             rootObject.addChildObject(asterismObj);
         }
-
-
-
-
-
-
-
 
 
 
@@ -472,7 +444,9 @@ public class PlanetariumViewManager extends GVRScript {
     public void onScroll(float scrollX, float scrollY) {
         if (Math.abs(scrollX) > Math.abs(scrollY)) {
             // horizontal scroll
-            rootObject.getTransform().rotateByAxis(scrollX / 5f, 0f, 1f, 0f);
+            if (rootObject != null) {
+                rootObject.getTransform().rotateByAxis(scrollX / 5f, 0f, 1f, 0f);
+            }
         }
     }
 

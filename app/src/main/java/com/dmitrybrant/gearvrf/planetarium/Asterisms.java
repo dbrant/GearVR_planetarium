@@ -32,85 +32,43 @@ public class Asterisms {
     public static final String TAG = "Asterisms";
 
     public static class Asterism {
-        private String name;
+        private final String name;
         public String getName() {
             return name;
         }
 
-        private List<List<AsterismNode>> lines = new ArrayList<>();
-        public List<List<AsterismNode>> getLines() {
-            return lines;
+        private List<AsterismNode> segments = new ArrayList<>();
+        public List<AsterismNode> getSegments() {
+            return segments;
         }
 
-        public Asterism(String name, BufferedReader reader) throws IOException {
-            this.name = name;
-            String line;
-            String[] lineArr;
-            boolean hasBegun = false;
-            while ((line = reader.readLine().trim()) != null) {
-                if (line.equals("[")) {
-                    hasBegun = true;
-                    continue;
-                }
-                if (line.equals("]")) {
-                    break;
-                }
-                if (!hasBegun) {
-                    continue;
-                }
-                if (!line.contains("[") && !line.contains("]")) {
-                    continue;
-                }
-                lineArr = line.replace("[", "").replace("]", "").split("\"");
-                if (lineArr.length == 0) {
-                    continue;
-                }
-                List<AsterismNode> nodeList = new ArrayList<>();
-                for (String s : lineArr) {
-                    if (s.trim().length() == 0) {
-                        continue;
-                    }
-                    AsterismNode node = new AsterismNode(s.trim());
-                    nodeList.add(node);
-                }
-                lines.add(nodeList);
+        public Asterism(String line) throws IOException {
+            String[] lineArr = line.split("\\s+");
+            name = lineArr[0];
+            for (int i = 2; i < lineArr.length; i++) {
+                int hipNum = Integer.parseInt(lineArr[i]);
+                AsterismNode node = new AsterismNode(hipNum);
+                segments.add(node);
             }
         }
 
         public GVRMesh createMesh(GVRContext context) {
-            int numVertices = 0;
-            int numIndices = 0;
-            for (List<AsterismNode> line : lines) {
-                numVertices += line.size();
-                numIndices += ((line.size() - 1) * 2);
-            }
-
-            float[] vertices = new float[numVertices * 3];
-            char[] indices = new char[numIndices];
+            float[] vertices = new float[segments.size() * 3];
+            char[] indices = new char[segments.size()];
             int vertexPos = 0;
-            int indexPos = 0;
-            int indexNum = 0;
-
             GVRMesh mesh = new GVRMesh(context);
-            for (List<AsterismNode> line : lines) {
-                for(AsterismNode node : line) {
-                    if (node.getStar() == null) {
-                        Log.w("foo", ">>>>>>>>>>>>>>>>>> orphan asterism node: " + node.getName());
-                        continue;
-                    }
-                    vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionX();
-                    vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionY();
-                    vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionZ();
+            for(AsterismNode node : segments) {
+                if (node.getStar() == null) {
+                    Log.w("foo", ">>>>>>>>>>>>>>>>>> orphan asterism node: " + node.getHipNum());
+                    continue;
                 }
-                int indexBase = indexNum;
-                for (int i = 0; i < line.size() - 1; i++) {
-                    indices[indexPos + i * 2] = (char) indexNum++;
-                    indices[indexPos + i * 2 + 1] = (char) indexNum;
-                }
-                indexPos += (line.size() - 1) * 2;
-                indexNum++;
+                vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionX();
+                vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionY();
+                vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionZ();
             }
-
+            for (int i = 0; i < indices.length; i++) {
+                indices[i] = (char) i;
+            }
             mesh.setVertices(vertices);
             mesh.setIndices(indices);
             return mesh;
@@ -118,9 +76,9 @@ public class Asterisms {
     }
 
     public static class AsterismNode {
-        private String name;
-        public String getName() {
-            return name;
+        private int hipNum;
+        public int getHipNum() {
+            return hipNum;
         }
 
         private SkyObject star;
@@ -131,8 +89,8 @@ public class Asterisms {
             this.star = star;
         }
 
-        public AsterismNode(String name) {
-            this.name = name;
+        public AsterismNode(int hipNum) {
+            this.hipNum = hipNum;
         }
     }
 
@@ -143,14 +101,12 @@ public class Asterisms {
 
     public static void addStar(SkyObject star) {
         for (Asterism asterism : asterisms) {
-            for (List<AsterismNode> line : asterism.getLines()) {
-                for (AsterismNode node : line) {
-                    if (star.name != null && star.name.contains(node.getName())) {
-                        node.setStar(star);
-                        // TODO: make this better
-                        // ensure that this star is displayed by artificially boosting its magnitude
-                        star.mag = 4f;
-                    }
+            for (AsterismNode node : asterism.segments) {
+                if (star.hipNum == (node.getHipNum())) {
+                    node.setStar(star);
+                    // TODO: make this better
+                    // ensure that this star is displayed by artificially boosting its magnitude
+                    star.mag = 4f;
                 }
             }
         }
@@ -164,10 +120,10 @@ public class Asterisms {
             BufferedReader buffreader = new BufferedReader(new InputStreamReader(instream));
             String line;
             while ((line = buffreader.readLine()) != null) {
-                if (!line.contains("\"")) {
+                if (line.trim().length() == 0) {
                     continue;
                 }
-                asterisms.add(new Asterism(line.replace("\"", "").trim(), buffreader));
+                asterisms.add(new Asterism(line.trim()));
             }
         } catch (IOException e) {
             Log.e(TAG, "Failed to read asterisms.", e);
