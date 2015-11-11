@@ -18,7 +18,6 @@ package com.dmitrybrant.gearvrf.planetarium;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.opengl.GLES20;
@@ -36,8 +35,10 @@ import org.gearvrf.utility.Log;
 
 public class Asterism {
     private static final String TAG = "Asterism";
-    private static final float LABEL_WIDTH = 40f;
-    private static final int LABEL_COLOR = 0x80003050;
+    private static final float LABEL_WIDTH = 50f;
+    private static final int LABEL_COLOR = 0x80005080;
+    private static final float OPACITY_PASSIVE = 0.2f;
+    private static final float OPACITY_ACTIVE = 1.0f;
 
     private static SolidColorShader asterismShader;
 
@@ -56,6 +57,14 @@ public class Asterism {
         return skyObject;
     }
 
+    private GVRSceneObject labelObject;
+    public GVRSceneObject getLabelObject() {
+        return labelObject;
+    }
+    public void setLabelObject(GVRSceneObject object) {
+        this.labelObject = object;
+    }
+
     public Asterism(String line, SkyObject skyObject) throws IOException {
         this.skyObject = skyObject;
         String[] lineArr = line.split("\\s+");
@@ -72,13 +81,12 @@ public class Asterism {
             asterismShader = new SolidColorShader(context);
         }
         GVRMaterial material = new GVRMaterial(context, asterismShader.getShaderId());
-        material.setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
         GVRMesh mesh = createMesh(context);
         GVRSceneObject asterismObj = new GVRSceneObject(context, mesh);
         asterismObj.getRenderData().setMaterial(material);
         asterismObj.getRenderData().setDepthTest(false);
         asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
-        getSkyObject().sceneObj = asterismObj;
+        skyObject.sceneObj = asterismObj;
         return asterismObj;
     }
 
@@ -99,6 +107,7 @@ public class Asterism {
         float aspect = (float) bounds.width() / (float) bounds.height();
         GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH * widthScale, LABEL_WIDTH * widthScale / aspect), new GVRBitmapTexture(gvrContext, bmp));
         sobj.getRenderData().setDepthTest(false);
+        sobj.getRenderData().getMaterial().setOpacity(OPACITY_PASSIVE);
         return sobj;
     }
 
@@ -120,6 +129,16 @@ public class Asterism {
             dec += node.getStar().dec;
         }
         return (float) (dec / nodes.size());
+    }
+
+    public void setActive() {
+        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
+        labelObject.getRenderData().getMaterial().setOpacity(Asterism.OPACITY_ACTIVE);
+    }
+
+    public void setPassive() {
+        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.02f, 0.05f, 0.0f);
+        labelObject.getRenderData().getMaterial().setOpacity(Asterism.OPACITY_PASSIVE);
     }
 
     private GVRMesh createMesh(GVRContext context) {

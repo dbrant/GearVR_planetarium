@@ -69,7 +69,6 @@ public class AsterismLoader {
                 skyObject.dist = StarLoader.DEFAULT_DISTANCE_STAR;
                 skyObject.initialScale = 1.0f;
                 skyObject.name = asterism.getName();
-
             }
         } catch (IOException e) {
             Log.e(TAG, "Failed to read asterisms.", e);

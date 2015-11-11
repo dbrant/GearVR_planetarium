@@ -207,6 +207,8 @@ public class PlanetariumViewManager extends GVRScript {
             setObjectPosition(labelObj, asterism.getCenterRa(), asterism.getCenterDec(), StarLoader.DEFAULT_DISTANCE_STAR);
             labelObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM + 1);
             rootObject.addChildObject(labelObj);
+            asterism.setLabelObject(labelObj);
+            asterism.setPassive();
         }
 
     }
@@ -214,7 +216,7 @@ public class PlanetariumViewManager extends GVRScript {
     @Override
     public void onStep() {
         for (Asterism asterism : asterismLoader.getAsterisms()) {
-            asterism.getSkyObject().sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.02f, 0.05f, 0.0f);
+            asterism.setPassive();
         }
 
         String text = "";
@@ -223,7 +225,12 @@ public class PlanetariumViewManager extends GVRScript {
             SkyObject obj = skyObjectList.get(Integer.parseInt(pickedObject.getHitObject().getName()));
 
             if (obj.type == SkyObject.TYPE_ASTERISM) {
-                obj.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.15f, 0.2f, 1.0f);
+                for (Asterism asterism : asterismLoader.getAsterisms()) {
+                    if (asterism.getSkyObject().equals(obj)) {
+                        asterism.setActive();
+                        break;
+                    }
+                }
                 continue;
             }
 
@@ -231,6 +238,7 @@ public class PlanetariumViewManager extends GVRScript {
                 continue;
             }
             haveNamedObject = true;
+            text = obj.name;
 
             if (unzoomAnimationList.size() > 0) {
                 for (GVRAnimation anim : unzoomAnimationList) {
@@ -266,6 +274,10 @@ public class PlanetariumViewManager extends GVRScript {
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
             String objName = pickedObject.getHitObject().getName();
             SkyObject obj = skyObjectList.get(Integer.parseInt(objName));
+
+            if (obj.type == SkyObject.TYPE_ASTERISM) {
+                continue;
+            }
 
             mActivity.loadWebPageForObject(obj);
             webViewVisible = true;
