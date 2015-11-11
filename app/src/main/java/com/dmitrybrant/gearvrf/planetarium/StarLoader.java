@@ -16,6 +16,7 @@
 package com.dmitrybrant.gearvrf.planetarium;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -117,6 +118,9 @@ public class StarLoader {
                 for (SkyObject star : starList) {
                     if (star.hipNum == index) {
                         star.name = Util.transformStarName(lineArr[1]);
+                        if (TextUtils.isEmpty(star.name)) {
+                            star.name = "HIP " + star.hipNum;
+                        }
                     }
                 }
             }

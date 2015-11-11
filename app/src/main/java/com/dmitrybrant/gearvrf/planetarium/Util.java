@@ -48,13 +48,6 @@ public class Util {
         return ret;
     }
 
-    public static void cleanupStarName(SkyObject obj) {
-        if (obj.name == null) {
-            obj.name = "HIP " + obj.hipNum;
-        }
-
-    }
-
     public static String bayerToGreek(String name) {
         name = name.replace("ALF", "Alpha");
         name = name.replace("BET", "Beta");
