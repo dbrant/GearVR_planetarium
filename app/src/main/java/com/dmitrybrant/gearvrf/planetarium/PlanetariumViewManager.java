@@ -42,6 +42,7 @@ import org.gearvrf.GVRScript;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
+import org.gearvrf.animation.GVROpacityAnimation;
 import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
 import org.gearvrf.animation.GVRScaleAnimation;
@@ -57,8 +58,6 @@ public class PlanetariumViewManager extends GVRScript {
     private static final int RENDER_ORDER_ASTERISM = 1000;
     private static final int RENDER_ORDER_BACKGROUND = 0;
 
-    private static final float DEFAULT_DISTANCE_STAR = 500f;
-
     private MainActivity mActivity;
     private GVRContext mContext;
 
@@ -67,6 +66,7 @@ public class PlanetariumViewManager extends GVRScript {
     private GVRSceneObject rootObject;
 
     private List<SkyObject> skyObjectList = new ArrayList<>();
+    AsterismLoader asterismLoader;
 
     private List<GVRAnimation> continuousAnimationList = new ArrayList<>();
     private List<GVRAnimation> unzoomAnimationList = new ArrayList<>();
@@ -97,8 +97,8 @@ public class PlanetariumViewManager extends GVRScript {
         NebulaLoader.loadNebulae(mContext, skyObjectList);
         OtherObjLoader.loadObjects(skyObjectList);
 
-        AsterismLoader asterismLoader = new AsterismLoader();
-        asterismLoader.loadAsterisms(mActivity);
+        asterismLoader = new AsterismLoader();
+        asterismLoader.loadAsterisms(mActivity, skyObjectList);
 
         StarLoader starLoader = new StarLoader();
         starLoader.loadStars(mActivity, skyObjectList);
@@ -161,7 +161,7 @@ public class PlanetariumViewManager extends GVRScript {
                 asterismLoader.addStar(obj);
                 if (obj.mag <= StarLoader.MAX_STAR_MAGNITUDE) {
                     GVRSceneObject sobj = starLoader.createSceneObject(gvrContext, obj, Integer.toString(i));
-                    setObjectPosition(sobj, obj.ra, obj.dec, DEFAULT_DISTANCE_STAR);
+                    setObjectPosition(sobj, obj.ra, obj.dec, StarLoader.DEFAULT_DISTANCE_STAR);
                     sobj.getRenderData().setRenderingOrder(RENDER_ORDER_STAR);
                     rootObject.addChildObject(sobj);
                 }
@@ -198,11 +198,13 @@ public class PlanetariumViewManager extends GVRScript {
 
         for (Asterism asterism : asterismLoader.getAsterisms()) {
             GVRSceneObject asterismObj = asterism.createSceneObject(gvrContext);
+            asterismObj.setName(Integer.toString(skyObjectList.indexOf(asterism.getSkyObject())));
             asterismObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM);
+            asterismObj.attachEyePointeeHolder();
             rootObject.addChildObject(asterismObj);
 
             GVRSceneObject labelObj = asterism.createLabelObject(gvrContext, mActivity);
-            setObjectPosition(labelObj, asterism.getCenterRa(), asterism.getCenterDec(), DEFAULT_DISTANCE_STAR);
+            setObjectPosition(labelObj, asterism.getCenterRa(), asterism.getCenterDec(), StarLoader.DEFAULT_DISTANCE_STAR);
             labelObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM + 1);
             rootObject.addChildObject(labelObj);
         }
@@ -211,40 +213,47 @@ public class PlanetariumViewManager extends GVRScript {
 
     @Override
     public void onStep() {
-        boolean havePicked = false;
-
-        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
-            try {
-                SkyObject obj = skyObjectList.get(Integer.parseInt(pickedObject.getHitObject().getName()));
-
-                textView.setText(obj.name);
-
-                if (unzoomAnimationList.size() > 0) {
-                    for (GVRAnimation anim : unzoomAnimationList) {
-                        anim.start(mAnimationEngine);
-                    }
-                    unzoomAnimationList.clear();
-                }
-
-                if (obj.type == SkyObject.TYPE_PLANET) {
-                    GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 5f);
-                    anim.start(mAnimationEngine);
-                    GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
-                    unzoomAnimationList.add(unanim);
-                } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
-                    GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 2f);
-                    anim.start(mAnimationEngine);
-                    GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
-                    unzoomAnimationList.add(unanim);
-                }
-            }catch(Exception ex) {
-                mActivity.createVrToast("error: " + ex.getMessage() + ", " + pickedObject.getHitObject().getName());
-            }
-            // only care about the first picked object
-            havePicked = true;
-            break;
+        for (Asterism asterism : asterismLoader.getAsterisms()) {
+            asterism.getSkyObject().sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.02f, 0.05f, 0.0f);
         }
-        if (!havePicked && textView.getText().length() > 0) {
+
+        String text = "";
+        boolean haveNamedObject = false;
+        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
+            SkyObject obj = skyObjectList.get(Integer.parseInt(pickedObject.getHitObject().getName()));
+
+            if (obj.type == SkyObject.TYPE_ASTERISM) {
+                obj.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.15f, 0.2f, 1.0f);
+                continue;
+            }
+
+            if (haveNamedObject) {
+                continue;
+            }
+            haveNamedObject = true;
+
+            if (unzoomAnimationList.size() > 0) {
+                for (GVRAnimation anim : unzoomAnimationList) {
+                    anim.start(mAnimationEngine);
+                }
+                unzoomAnimationList.clear();
+            }
+
+            if (obj.type == SkyObject.TYPE_PLANET) {
+                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 5f);
+                anim.start(mAnimationEngine);
+                GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
+                unzoomAnimationList.add(unanim);
+            } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
+                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 2f);
+                anim.start(mAnimationEngine);
+                GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
+                unzoomAnimationList.add(unanim);
+            }
+        }
+        if (text.length() > 0) {
+            textView.setText(text);
+        } else if (!haveNamedObject && textView.getText().length() > 0) {
             textView.setText("");
         }
     }

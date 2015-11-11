@@ -21,7 +21,9 @@ public class SkyObject {
     public static final int TYPE_STAR = 0;
     public static final int TYPE_PLANET = 1;
     public static final int TYPE_NEBULA = 2;
-    public static final int TYPE_OTHER = 3;
+    public static final int TYPE_ASTERISM = 3;
+    public static final int TYPE_ASTERISM_LABEL = 4;
+    public static final int TYPE_OTHER = 5;
 
     public GVRSceneObject sceneObj;
 

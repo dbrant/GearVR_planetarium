@@ -39,7 +39,7 @@ public class Asterism {
     private static final float LABEL_WIDTH = 40f;
     private static final int LABEL_COLOR = 0x80003050;
 
-    private static GVRMaterial asterismMaterial;
+    private static SolidColorShader asterismShader;
 
     private final String name;
     public String getName() {
@@ -51,7 +51,13 @@ public class Asterism {
         return nodes;
     }
 
-    public Asterism(String line) throws IOException {
+    private SkyObject skyObject;
+    public SkyObject getSkyObject() {
+        return skyObject;
+    }
+
+    public Asterism(String line, SkyObject skyObject) throws IOException {
+        this.skyObject = skyObject;
         String[] lineArr = line.split("\\s+");
         name = Util.bayerToFullName(lineArr[0]);
         for (int i = 2; i < lineArr.length; i++) {
@@ -62,16 +68,17 @@ public class Asterism {
     }
 
     public GVRSceneObject createSceneObject(GVRContext context) {
-        if (asterismMaterial == null) {
-            SolidColorShader shader = new SolidColorShader(context);
-            asterismMaterial = new GVRMaterial(context, shader.getShaderId());
-            asterismMaterial.setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
+        if (asterismShader == null) {
+            asterismShader = new SolidColorShader(context);
         }
+        GVRMaterial material = new GVRMaterial(context, asterismShader.getShaderId());
+        material.setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
         GVRMesh mesh = createMesh(context);
         GVRSceneObject asterismObj = new GVRSceneObject(context, mesh);
-        asterismObj.getRenderData().setMaterial(asterismMaterial);
+        asterismObj.getRenderData().setMaterial(material);
         asterismObj.getRenderData().setDepthTest(false);
         asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
+        getSkyObject().sceneObj = asterismObj;
         return asterismObj;
     }
 

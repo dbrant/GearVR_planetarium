@@ -47,7 +47,7 @@ public class AsterismLoader {
         }
     }
 
-    public void loadAsterisms(Context context) {
+    public void loadAsterisms(Context context, List<SkyObject> objectList) {
         InputStream instream = null;
         try {
             Log.d(TAG, "Loading asterisms...");
@@ -58,7 +58,18 @@ public class AsterismLoader {
                 if (line.trim().length() == 0) {
                     continue;
                 }
-                asterisms.add(new Asterism(line.trim()));
+
+                SkyObject skyObject = new SkyObject();
+                objectList.add(skyObject);
+
+                Asterism asterism = new Asterism(line.trim(), skyObject);
+                asterisms.add(asterism);
+
+                skyObject.type = SkyObject.TYPE_ASTERISM;
+                skyObject.dist = StarLoader.DEFAULT_DISTANCE_STAR;
+                skyObject.initialScale = 1.0f;
+                skyObject.name = asterism.getName();
+
             }
         } catch (IOException e) {
             Log.e(TAG, "Failed to read asterisms.", e);
