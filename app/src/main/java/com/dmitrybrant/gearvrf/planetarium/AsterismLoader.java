@@ -41,7 +41,9 @@ public class AsterismLoader {
                     node.setStar(star);
                     // TODO: make this better
                     // ensure that this star is displayed by artificially boosting its magnitude
-                    star.mag = 4f;
+                    if (star.mag > StarLoader.MAX_STAR_MAGNITUDE) {
+                        star.mag = StarLoader.MAX_STAR_MAGNITUDE - 0.01f;
+                    }
                 }
             }
         }

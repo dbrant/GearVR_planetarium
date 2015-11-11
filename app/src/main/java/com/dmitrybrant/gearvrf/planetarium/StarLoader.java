@@ -118,9 +118,6 @@ public class StarLoader {
                 for (SkyObject star : starList) {
                     if (star.hipNum == index) {
                         star.name = Util.transformStarName(lineArr[1]);
-                        if (TextUtils.isEmpty(star.name)) {
-                            star.name = "HIP " + star.hipNum;
-                        }
                     }
                 }
             }

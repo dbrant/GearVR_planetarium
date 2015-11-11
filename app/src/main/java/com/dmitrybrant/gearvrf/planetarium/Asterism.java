@@ -68,7 +68,7 @@ public class Asterism {
     public Asterism(String line, SkyObject skyObject) throws IOException {
         this.skyObject = skyObject;
         String[] lineArr = line.split("\\s+");
-        name = Util.bayerToFullName(lineArr[0]);
+        name = Util.bayerExToFullName(Util.bayerToFullName(lineArr[0]));
         for (int i = 2; i < lineArr.length; i++) {
             int hipNum = Integer.parseInt(lineArr[i]);
             AsterismNode node = new AsterismNode(hipNum);

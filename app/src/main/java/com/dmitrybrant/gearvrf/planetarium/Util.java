@@ -196,6 +196,13 @@ public class Util {
         return name;
     }
 
+    public static String bayerExToFullName(String name) {
+        // TODO: these are nonstandard
+        name = name.replace("SCPT", "Serpens Caput");
+        name = name.replace("SCDA", "Serpens Cauda");
+        return name;
+    }
+
     public static String bayerToGenitive(String name) {
         name = name.replace("And", "Andromedae");
         name = name.replace("Ant", "Antliae");
