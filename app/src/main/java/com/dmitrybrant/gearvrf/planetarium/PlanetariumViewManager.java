@@ -248,7 +248,7 @@ public class PlanetariumViewManager extends GVRScript {
                 GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
                 unzoomAnimationList.add(unanim);
             } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
-                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 2f);
+                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 4f);
                 anim.start(mAnimationEngine);
                 GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
                 unzoomAnimationList.add(unanim);
