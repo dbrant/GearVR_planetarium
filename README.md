@@ -6,7 +6,8 @@ This is a simple (but evolving) planetarium app for Samsung Gear VR!
 Dmitry Brant, Wikimedia Foundation.
 
 Features:
-* All stars in the night sky brighter than magnitude 4.5.
+* All stars in the night sky brighter than magnitude 4.7.
+* Constellations with name labels.
 * Textured and correctly-positioned planets (with exaggerated size for easier selection).
 * Small selection of Messier objects.
 * Hover over an object to see its name.
@@ -18,7 +19,6 @@ To do:
 * Rings on Neptune.
 * Moons of other planets.
 * Tilt of other planets.
-* Constellation lines / borders.
 * Milky Way background.
 * More Messier objects.
 
