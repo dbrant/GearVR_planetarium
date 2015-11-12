@@ -16,7 +16,6 @@
 package com.dmitrybrant.gearvrf.planetarium;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,7 +34,7 @@ import org.gearvrf.utility.Log;
 
 public class StarLoader {
     private static final String TAG = "StarLoader";
-    public static final float MAX_STAR_MAGNITUDE = 4.5f;
+    public static final float MAX_STAR_MAGNITUDE = 4.7f;
     public static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private static GVRMesh starMesh;

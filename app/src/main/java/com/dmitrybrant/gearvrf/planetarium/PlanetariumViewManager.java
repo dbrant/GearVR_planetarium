@@ -42,7 +42,6 @@ import org.gearvrf.GVRScript;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
-import org.gearvrf.animation.GVROpacityAnimation;
 import org.gearvrf.animation.GVRRepeatMode;
 import org.gearvrf.animation.GVRRotationByAxisWithPivotAnimation;
 import org.gearvrf.animation.GVRScaleAnimation;
@@ -70,6 +69,7 @@ public class PlanetariumViewManager extends GVRScript {
 
     private List<GVRAnimation> continuousAnimationList = new ArrayList<>();
     private List<GVRAnimation> unzoomAnimationList = new ArrayList<>();
+    private boolean prevPickedNamedObject;
 
     private GVRTextViewSceneObject textView;
     private GVRWebViewSceneObject webViewObject;
@@ -240,15 +240,10 @@ public class PlanetariumViewManager extends GVRScript {
             haveNamedObject = true;
             text = obj.name;
 
-            if (unzoomAnimationList.size() > 0) {
-                for (GVRAnimation anim : unzoomAnimationList) {
-                    anim.start(mAnimationEngine);
-                }
-                unzoomAnimationList.clear();
-            }
+            unzoomAll();
 
             if (obj.type == SkyObject.TYPE_PLANET) {
-                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 5f);
+                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 8f);
                 anim.start(mAnimationEngine);
                 GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
                 unzoomAnimationList.add(unanim);
@@ -259,6 +254,12 @@ public class PlanetariumViewManager extends GVRScript {
                 unzoomAnimationList.add(unanim);
             }
         }
+
+        if (prevPickedNamedObject && !haveNamedObject) {
+            unzoomAll();
+        }
+        prevPickedNamedObject = haveNamedObject;
+
         if (text.length() > 0) {
             textView.setText(text);
         } else if (!haveNamedObject && textView.getText().length() > 0) {
@@ -266,7 +267,16 @@ public class PlanetariumViewManager extends GVRScript {
         }
     }
 
-    void onTap() {
+    private void unzoomAll() {
+        if (unzoomAnimationList.size() > 0) {
+            for (GVRAnimation anim : unzoomAnimationList) {
+                anim.start(mAnimationEngine);
+            }
+            unzoomAnimationList.clear();
+        }
+    }
+
+    public void onTap() {
         if (null == mMainScene) {
             return;
         }
