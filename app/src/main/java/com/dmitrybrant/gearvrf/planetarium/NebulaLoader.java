@@ -48,7 +48,7 @@ public class NebulaLoader {
         addNebula(context, objectList, R.drawable.m13, Util.hmsToDec(16f, 41f, 41.24f), Util.dmsToDec(36f, 27f, 35.5f), DEFAULT_SCALE, R.string.m13);
         addNebula(context, objectList, R.drawable.m16, Util.hmsToDec(18f, 18f, 48f), Util.dmsToDec(-13f, 49f, 0f), DEFAULT_SCALE, R.string.m16);
         addNebula(context, objectList, R.drawable.m27, Util.hmsToDec(19f, 59f, 36.34f), Util.dmsToDec(-22f, 43f, 16.09f), DEFAULT_SCALE, R.string.m27);
-        addNebula(context, objectList, R.drawable.m31, Util.hmsToDec(0f, 41.8f, 0f), Util.dmsToDec(41f, 16f, 0f), DEFAULT_SCALE, R.string.m31);
+        addNebula(context, objectList, R.drawable.m31, Util.hmsToDec(0f, 41.8f, 0f), Util.dmsToDec(41f, 16f, 0f), 5.0f, R.string.m31);
         addNebula(context, objectList, R.drawable.m42, Util.hmsToDec(5f, 35f, 17.3f), Util.dmsToDec(-5f, 23f, 28f), DEFAULT_SCALE, R.string.m42);
         addNebula(context, objectList, R.drawable.m51, Util.hmsToDec(13f, 30f, 0f), Util.dmsToDec(47f, 11f, 0f), DEFAULT_SCALE, R.string.m51);
         addNebula(context, objectList, R.drawable.m57, Util.hmsToDec(18f, 53.6f, 0f), Util.dmsToDec(33f, 2f, 0f), DEFAULT_SCALE, R.string.m57);
