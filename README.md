@@ -1,9 +1,9 @@
 Planetarium for Samsung Gear VR
 ===============================
 
-This is a simple (but evolving) planetarium app for Samsung Gear VR!
+[![Build Status](https://travis-ci.org/dbrant/GearVR_planetarium.svg)](https://travis-ci.org/dbrant/GearVR_planetarium)
 
-Dmitry Brant, Wikimedia Foundation.
+A basic (but evolving) virtual planetarium app for Samsung Gear VR!
 
 Features:
 * All stars in the night sky brighter than magnitude 4.7.
@@ -27,7 +27,7 @@ Notes
 
 This project contains pre-built binaries from the Oculus SDK and the Samsung Gear VR Framework (the framework still uses Eclipse instead of Gradle). To update, use these resources:
 * https://github.com/Samsung/GearVRf/releases
-* https://developer.oculus.com/downloads/mobile/0.6.2.0/Oculus_Mobile_SDK/
+* https://developer.oculus.com/downloads/mobile/1.0.0.0/Oculus_Mobile_SDK/
 
 This project uses Wikimedia's RESTBase API for retrieving article content: http://rest.wikimedia.org/en.wikipedia.org/v1/?doc
 
@@ -36,7 +36,7 @@ This project uses the AstroLib library (http://mhuss.com/AstroLib/) for calculat
 License
 -------
 
-    Copyright 2015 Dmitry Brant
+    Copyright (c) 2015-2016 Dmitry Brant
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
