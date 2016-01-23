@@ -13,13 +13,17 @@
  * limitations under the License.
  */-->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dmitrybrant.gearvrf.planetarium">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.dmitrybrant.gearvrf.planetarium"
+    android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -42,6 +46,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.INFO" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

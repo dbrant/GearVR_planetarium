@@ -325,28 +325,7 @@ public class PlanetariumViewManager extends GVRScript {
 
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
-            mContext.captureScreenLeft(new GVRScreenshotCallback() {
-                @Override
-                public void onScreenCaptured(Bitmap bitmap) {
-                    try {
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                        int imageIndex = 0;
-                        File f;
-                        String fileName;
-                        do {
-                            fileName = Integer.toString(imageIndex) + ".png";
-                            imageIndex++;
-                        } while ((f = new File(Environment.getExternalStorageDirectory().getPath() + "/" + fileName)).exists());
-                        FileOutputStream fo = new FileOutputStream(f);
-                        fo.write(bytes.toByteArray());
-                        fo.close();
-                        mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
-                    } catch (Exception e) {
-                        mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
-                    }
-                }
-            });
+            //takeScreenshot();
         }
 
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
@@ -367,7 +346,6 @@ public class PlanetariumViewManager extends GVRScript {
             }
         }
     }
-
 
     private void setupAnimation(GVRAnimation animation) {
         animation.setRepeatMode(GVRRepeatMode.REPEATED).setRepeatCount(-1);
@@ -395,4 +373,28 @@ public class PlanetariumViewManager extends GVRScript {
                 0.0f, 0.0f, 0.0f));
     }
 
+    private void takeScreenshot() {
+        mContext.captureScreenLeft(new GVRScreenshotCallback() {
+            @Override
+            public void onScreenCaptured(Bitmap bitmap) {
+                try {
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                    int imageIndex = 0;
+                    File f;
+                    String fileName;
+                    do {
+                        fileName = Integer.toString(imageIndex) + ".png";
+                        imageIndex++;
+                    } while ((f = new File(Environment.getExternalStorageDirectory().getPath() + "/" + fileName)).exists());
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.close();
+                    mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
+                } catch (Exception e) {
+                    mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
+                }
+            }
+        });
+    }
 }
