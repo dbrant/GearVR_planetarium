@@ -6,7 +6,7 @@ Planetarium for Samsung Gear VR
 A basic (but evolving) virtual planetarium app for Samsung Gear VR!
 
 Features:
-* All stars in the night sky brighter than magnitude 4.7.
+* All stars in the night sky brighter than magnitude 4.5.
 * Constellations with name labels.
 * Textured and correctly-positioned planets (with exaggerated size for easier selection).
 * Small selection of Messier objects.
@@ -21,6 +21,14 @@ To do:
 * Tilt of other planets.
 * Milky Way background.
 * More Messier objects.
+
+Running on your device
+----------------------
+
+To run the app on your device, you'll need to generate an Oculus Signature File for the device, and put the file in the "assets" directory.
+https://developer.oculus.com/osig/
+
+You may then build and run the app in the usual way.
 
 Notes
 -----
