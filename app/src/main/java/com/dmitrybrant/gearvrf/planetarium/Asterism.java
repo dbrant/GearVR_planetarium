@@ -37,7 +37,7 @@ public class Asterism {
     private static final String TAG = "Asterism";
     private static final float LABEL_WIDTH = 50f;
     private static final int LABEL_COLOR = 0x80005080;
-    private static final float OPACITY_PASSIVE = 0.2f;
+    private static final float OPACITY_PASSIVE = 0.3f;
     private static final float OPACITY_ACTIVE = 1.0f;
 
     private static SolidColorShader asterismShader;
@@ -132,12 +132,12 @@ public class Asterism {
     }
 
     public void setActive() {
-        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.15f, 1.0f);
+        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.20f, 1.0f);
         labelObject.getRenderData().getMaterial().setOpacity(Asterism.OPACITY_ACTIVE);
     }
 
     public void setPassive() {
-        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.02f, 0.05f, 0.0f);
+        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.02f, 0.1f, 0.5f);
         labelObject.getRenderData().getMaterial().setOpacity(Asterism.OPACITY_PASSIVE);
     }
 
