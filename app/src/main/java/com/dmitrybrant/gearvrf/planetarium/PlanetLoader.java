@@ -35,6 +35,8 @@ import java.util.List;
 public class PlanetLoader {
     public static final float DEFAULT_DISTANCE_PLANET = 50f;
 
+    private static GVRMesh planetMesh;
+
     public static GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name, int renderOrder, GVRLight light) throws IOException {
         GVRSceneObject planetRevolutionObject = new GVRSceneObject(context);
         obj.sceneObj = planetRevolutionObject;
@@ -43,8 +45,8 @@ public class PlanetLoader {
         planetRevolutionObject.addChildObject(planetRotationObject);
 
         GVRSceneObject planetMeshObject = new GVRSceneObject(context,
-                new GVRAndroidResource(context, "sphere.obj"),
-                new GVRAndroidResource(context, obj.texName));
+                getPlanetMesh(context),
+                context.loadTexture(new GVRAndroidResource(context, obj.texName)));
 
         planetRotationObject.addChildObject(planetMeshObject);
         planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
@@ -67,6 +69,13 @@ public class PlanetLoader {
             planetMeshObject.getTransform().rotateByAxis(70f, 0f, 1f, 0f);
         }
         return planetRevolutionObject;
+    }
+
+    private static GVRMesh getPlanetMesh(GVRContext context) throws IOException {
+        if (planetMesh == null) {
+            planetMesh = context.loadMesh(new GVRAndroidResource(context, "sphere.obj"));
+        }
+        return planetMesh;
     }
 
     public static void addRings(GVRContext context, SkyObject obj, float innerRadius, float outerRadius, float rotation, int ringResId, int renderOrder) {

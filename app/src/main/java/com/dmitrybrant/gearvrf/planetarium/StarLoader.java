@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
@@ -38,6 +37,7 @@ public class StarLoader {
     public static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private static GVRMesh starMesh;
+    private static GVRTexture starTexture;
     private static GVRMaterial[] starMaterials;
 
     public GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
@@ -49,9 +49,10 @@ public class StarLoader {
         if (matIndex >= starMaterials.length) {
             matIndex = starMaterials.length - 1;
         }
-        GVRSceneObject sobj = new GVRSceneObject(context, starMesh);
+        GVRSceneObject sobj = new GVRSceneObject(context, getStarMesh(context));
         obj.sceneObj = sobj;
         sobj.getRenderData().setMaterial(starMaterials[matIndex]);
+
         sobj.getRenderData().setDepthTest(false);
         float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
         if (scale < 1f) {
@@ -132,21 +133,33 @@ public class StarLoader {
         }
     }
 
+    private GVRMesh getStarMesh(GVRContext context) {
+        if (starMesh == null) {
+            starMesh = new GVRMesh(context);
+            starMesh.setVertices(new float[]{-5f, -4.5f, 0f, 0f, 5.5f, 0f, 5f, -4.5f, 0f});
+            starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
+            starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
+            starMesh.setIndices(new char[]{0, 2, 1});
+        }
+        return starMesh;
+    }
+
+    private GVRTexture getStarTexture(GVRContext context) {
+        if (starTexture == null) {
+            starTexture = context.loadTexture(new GVRAndroidResource(context, R.drawable.star4));
+        }
+        return starTexture;
+    }
+
     private void initMaterials(GVRContext context) {
-        if (starMesh != null) {
+        if (starMaterials != null) {
             return;
         }
-        starMesh = new GVRMesh(context);
-        starMesh.setVertices(new float[]{-5f, -4.5f, 0f, 0f, 5.5f, 0f, 5f, -4.5f, 0f});
-        starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
-        starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
-        starMesh.setIndices(new char[]{0, 2, 1});
-        Future<GVRTexture> starTexture = context.loadFutureTexture(new GVRAndroidResource(context, R.drawable.star4));
         starMaterials = new GVRMaterial[10];
         float colorVal = 0f, colorInc = 0.9f / (float) starMaterials.length;
         for (int i = 0; i < starMaterials.length; i++) {
             starMaterials[i] = new GVRMaterial(context);
-            starMaterials[i].setMainTexture(starTexture);
+            starMaterials[i].setMainTexture(getStarTexture(context));
             float c = 0.1f + colorVal;
             colorVal += colorInc;
             starMaterials[i].setColor(c, c, c * 0.90f);
