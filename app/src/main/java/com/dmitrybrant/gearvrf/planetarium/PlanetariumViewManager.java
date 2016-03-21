@@ -132,9 +132,9 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.getMainCameraRig().addChildObject(headTracker);
 
         // text view...
-        textView = new GVRTextViewSceneObject(gvrContext, mActivity, 4f, 2f, "");
+        textView = new GVRTextViewSceneObject(gvrContext, 4f, 2f, "");
         textView.getTransform().setPosition(0.0f, 1.5f, -10.0f);
-        textView.setTextSize(textView.getTextSize());
+        textView.setTextSize(textView.getTextSize() / 4);
         textView.setText("");
         textView.setTextColor(Color.CYAN);
         textView.setGravity(Gravity.CENTER);
@@ -390,9 +390,9 @@ public class PlanetariumViewManager extends GVRScript {
                     FileOutputStream fo = new FileOutputStream(f);
                     fo.write(bytes.toByteArray());
                     fo.close();
-                    mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
+                    //mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
                 } catch (Exception e) {
-                    mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
+                    //mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
                 }
             }
         });
