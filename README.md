@@ -1,3 +1,4 @@
+![header image](https://raw.github.com/dbrant/GearVR_planetarium/master/screenshot1.png)
 Planetarium for Samsung Gear VR
 ===============================
 
@@ -29,13 +30,14 @@ To run the app on your device, you'll need to generate an Oculus Signature File 
 https://developer.oculus.com/osig/
 
 You may then build and run the app in the usual way.
+The app has been tested on the Galaxy Note 4, Galaxy S6, and Galaxy S7.
 
 Notes
 -----
 
 This project contains pre-built binaries from the Oculus SDK and the Samsung Gear VR Framework (the framework still uses Eclipse instead of Gradle). To update, use these resources:
 * https://github.com/Samsung/GearVRf/releases
-* https://developer.oculus.com/downloads/mobile/1.0.0.0/Oculus_Mobile_SDK/
+* https://developer.oculus.com/downloads/mobile/1.0.0.1/Oculus_Mobile_SDK/
 
 This project uses Wikimedia's RESTBase API for retrieving article content: http://rest.wikimedia.org/en.wikipedia.org/v1/?doc
 
