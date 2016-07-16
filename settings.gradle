@@ -1,1 +1,1 @@
-include ':app', ':gearvrf'
+include ':app', ':gvrf-3.0.1'

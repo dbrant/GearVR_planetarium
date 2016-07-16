@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 package com.dmitrybrant.gearvrf.planetarium;
 
 import android.os.Bundle;
