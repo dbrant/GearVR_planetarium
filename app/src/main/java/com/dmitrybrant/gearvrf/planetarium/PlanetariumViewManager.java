@@ -55,6 +55,7 @@ public class PlanetariumViewManager extends GVRScript {
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_STAR = 2000;
     private static final int RENDER_ORDER_ASTERISM = 1000;
+    private static final int RENDER_ORDER_NEBULA = 1;
     private static final int RENDER_ORDER_BACKGROUND = 0;
 
     private MainActivity mActivity;
@@ -121,6 +122,9 @@ public class PlanetariumViewManager extends GVRScript {
         rootObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(rootObject);
 
+        // sky background
+        rootObject.addChildObject(SkyLoader.createSceneObject(gvrContext, RENDER_ORDER_BACKGROUND));
+
         // head-tracking pointer
         GVRSceneObject headTracker = new GVRSceneObject(gvrContext,
                 new FutureWrapper<>(gvrContext.createQuad(1f, 1f)),
@@ -163,7 +167,6 @@ public class PlanetariumViewManager extends GVRScript {
                 if (obj.mag <= StarLoader.MAX_STAR_MAGNITUDE) {
                     GVRSceneObject sobj = starLoader.createSceneObject(gvrContext, obj, Integer.toString(i));
                     setObjectPosition(sobj, obj.ra, obj.dec, StarLoader.DEFAULT_DISTANCE_STAR);
-                    sobj.getRenderData().setRenderingOrder(RENDER_ORDER_STAR);
                     rootObject.addChildObject(sobj);
                 }
 
@@ -171,7 +174,7 @@ public class PlanetariumViewManager extends GVRScript {
 
                 GVRSceneObject sobj = NebulaLoader.createSceneObject(mContext, obj, Integer.toString(i));
                 rootObject.addChildObject(sobj);
-                sobj.getRenderData().setRenderingOrder(RENDER_ORDER_BACKGROUND);
+                sobj.getRenderData().setRenderingOrder(RENDER_ORDER_NEBULA);
                 setObjectPosition(sobj, obj.ra, obj.dec, obj.dist);
 
             } else if (obj.type == SkyObject.TYPE_PLANET) {
@@ -211,7 +214,6 @@ public class PlanetariumViewManager extends GVRScript {
             asterism.setLabelObject(labelObj);
             asterism.setPassive();
         }
-
     }
 
     @Override

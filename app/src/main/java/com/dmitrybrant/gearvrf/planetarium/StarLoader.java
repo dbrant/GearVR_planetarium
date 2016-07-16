@@ -33,27 +33,14 @@ import org.gearvrf.utility.Log;
 
 public class StarLoader {
     private static final String TAG = "StarLoader";
-    public static final float MAX_STAR_MAGNITUDE = 4f;
+    public static final float MAX_STAR_MAGNITUDE = 4.7f;
     public static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private static GVRMesh starMesh;
-    private static GVRTexture starTexture;
-    private static GVRMaterial[] starMaterials;
 
     public GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
-        initMaterials(context);
-        int matIndex = (int) (starMaterials.length - obj.mag * ((float) starMaterials.length / MAX_STAR_MAGNITUDE));
-        if (matIndex < 0) {
-            matIndex = 0;
-        }
-        if (matIndex >= starMaterials.length) {
-            matIndex = starMaterials.length - 1;
-        }
         GVRSceneObject sobj = new GVRSceneObject(context, getStarMesh(context));
         obj.sceneObj = sobj;
-        sobj.getRenderData().setMaterial(starMaterials[matIndex]);
-
-        sobj.getRenderData().setDepthTest(false);
         float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
         if (scale < 1f) {
             scale = 1f;
@@ -142,27 +129,5 @@ public class StarLoader {
             starMesh.setIndices(new char[]{0, 2, 1});
         }
         return starMesh;
-    }
-
-    private GVRTexture getStarTexture(GVRContext context) {
-        if (starTexture == null) {
-            starTexture = context.loadTexture(new GVRAndroidResource(context, R.drawable.star4));
-        }
-        return starTexture;
-    }
-
-    private void initMaterials(GVRContext context) {
-        if (starMaterials != null) {
-            return;
-        }
-        starMaterials = new GVRMaterial[10];
-        float colorVal = 0f, colorInc = 0.9f / (float) starMaterials.length;
-        for (int i = 0; i < starMaterials.length; i++) {
-            starMaterials[i] = new GVRMaterial(context);
-            starMaterials[i].setMainTexture(getStarTexture(context));
-            float c = 0.1f + colorVal;
-            colorVal += colorInc;
-            starMaterials[i].setColor(c, c, c * 0.90f);
-        }
     }
 }
