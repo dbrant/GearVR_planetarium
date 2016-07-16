@@ -153,6 +153,7 @@ public class PlanetariumViewManager extends GVRScript {
         GVRLight mLight = new GVRLight(gvrContext);
         mLight.setAmbientIntensity(0.5f, 0.5f, 0.5f, 1.0f);
         mLight.setDiffuseIntensity(1.0f, 1.0f, 1.0f, 1.0f);
+        mLight.setSpecularIntensity(1.0f, 1.0f, 1.0f, 1.0f);
 
         for (int i = 0; i < skyObjectList.size(); i++) {
             SkyObject obj = skyObjectList.get(i);
@@ -200,7 +201,7 @@ public class PlanetariumViewManager extends GVRScript {
             GVRSceneObject asterismObj = asterism.createSceneObject(gvrContext);
             asterismObj.setName(Integer.toString(skyObjectList.indexOf(asterism.getSkyObject())));
             asterismObj.getRenderData().setRenderingOrder(RENDER_ORDER_ASTERISM);
-            asterismObj.attachEyePointeeHolder();
+            asterismObj.setPickingEnabled(true);
             rootObject.addChildObject(asterismObj);
 
             GVRSceneObject labelObj = asterism.createLabelObject(gvrContext, mActivity);

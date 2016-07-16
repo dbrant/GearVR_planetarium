@@ -33,7 +33,7 @@ import org.gearvrf.utility.Log;
 
 public class StarLoader {
     private static final String TAG = "StarLoader";
-    public static final float MAX_STAR_MAGNITUDE = 4.5f;
+    public static final float MAX_STAR_MAGNITUDE = 4f;
     public static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private static GVRMesh starMesh;
@@ -60,7 +60,7 @@ public class StarLoader {
         }
         obj.initialScale = scale;
         sobj.getTransform().setScale(scale, scale, scale);
-        sobj.attachEyePointeeHolder();
+        sobj.setPickingEnabled(true);
         sobj.setName(name);
         return sobj;
     }

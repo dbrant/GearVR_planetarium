@@ -37,7 +37,7 @@ public class NebulaLoader {
         obj.sceneObj = sobj;
         sobj.getRenderData().setDepthTest(false);
         sobj.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
-        sobj.attachEyePointeeHolder();
+        sobj.setPickingEnabled(true);
         sobj.setName(name);
         return sobj;
     }

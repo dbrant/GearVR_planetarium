@@ -21,7 +21,6 @@ import com.mhuss.AstroLib.ObsInfo;
 import com.mhuss.AstroLib.PlanetData;
 import com.mhuss.AstroLib.Planets;
 
-import org.gearvrf.FutureWrapper;
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRLight;
@@ -52,7 +51,7 @@ public class PlanetLoader {
         planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
         planetMeshObject.getRenderData().setDepthTest(false);
         planetMeshObject.getRenderData().setRenderingOrder(renderOrder);
-        planetMeshObject.attachEyePointeeHolder();
+        planetMeshObject.setPickingEnabled(true);
         planetMeshObject.setName(name);
 
         // TODO: implement correct lighting
@@ -80,8 +79,7 @@ public class PlanetLoader {
 
     public static void addRings(GVRContext context, SkyObject obj, float innerRadius, float outerRadius, float rotation, int ringResId, int renderOrder) {
         GVRMesh ringMesh = RingMesh.createRingMesh(context, innerRadius, outerRadius, 32);
-        GVRSceneObject ringObj = new GVRSceneObject(context, new FutureWrapper<>(ringMesh),
-                context.loadFutureTexture(new GVRAndroidResource(context, ringResId)));
+        GVRSceneObject ringObj = new GVRSceneObject(context, ringMesh, context.loadTexture(new GVRAndroidResource(context, ringResId)));
 
         ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
         ringObj.getRenderData().setDepthTest(true);
