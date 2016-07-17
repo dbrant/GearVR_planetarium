@@ -39,7 +39,6 @@ import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScreenshotCallback;
 import org.gearvrf.GVRScript;
-import org.gearvrf.GVRSphereCollider;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
@@ -56,8 +55,8 @@ public class PlanetariumViewManager extends GVRScript {
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_STAR = 2000;
     private static final int RENDER_ORDER_ASTERISM = 1000;
-    private static final int RENDER_ORDER_NEBULA = 1;
-    private static final int RENDER_ORDER_BACKGROUND = 0;
+    private static final int RENDER_ORDER_NEBULA = 100;
+    private static final int RENDER_ORDER_MILKY_WAY = 0;
 
     private MainActivity mActivity;
     private GVRContext mContext;
@@ -124,7 +123,7 @@ public class PlanetariumViewManager extends GVRScript {
         mMainScene.addSceneObject(rootObject);
 
         // sky background
-        rootObject.addChildObject(SkyLoader.createSceneObject(gvrContext, RENDER_ORDER_BACKGROUND));
+        rootObject.addChildObject(SkyLoader.createSceneObject(gvrContext, RENDER_ORDER_MILKY_WAY));
 
         // head-tracking pointer
         GVRSceneObject headTracker = new GVRSceneObject(gvrContext,
