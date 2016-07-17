@@ -39,6 +39,7 @@ import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScreenshotCallback;
 import org.gearvrf.GVRScript;
+import org.gearvrf.GVRSphereCollider;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
@@ -134,6 +135,7 @@ public class PlanetariumViewManager extends GVRScript {
         headTracker.getRenderData().setDepthTest(false);
         headTracker.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
         mMainScene.getMainCameraRig().addChildObject(headTracker);
+        mMainScene.setStatsEnabled(true);
 
         // text view...
         textView = new GVRTextViewSceneObject(gvrContext, 4f, 2f, "");

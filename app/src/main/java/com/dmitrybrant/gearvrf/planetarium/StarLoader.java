@@ -23,32 +23,30 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
-import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRSceneObject;
-import org.gearvrf.GVRTexture;
+import org.gearvrf.GVRSphereCollider;
 import org.gearvrf.utility.Log;
 
 public class StarLoader {
     private static final String TAG = "StarLoader";
-    public static final float MAX_STAR_MAGNITUDE = 4.7f;
+    public static final float MAX_STAR_MAGNITUDE = 5f;
     public static final float DEFAULT_DISTANCE_STAR = 500f;
 
     private static GVRMesh starMesh;
 
     public GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
         GVRSceneObject sobj = new GVRSceneObject(context, getStarMesh(context));
+        float scale = 6.0f;
         obj.sceneObj = sobj;
-        float scale = 1.0f / (obj.mag < 0.75f ? 0.75f : obj.mag);
-        if (scale < 1f) {
-            scale = 1f;
-        }
         obj.initialScale = scale;
         sobj.getTransform().setScale(scale, scale, scale);
-        sobj.setPickingEnabled(true);
         sobj.setName(name);
+
+        GVRSphereCollider c = new GVRSphereCollider(context);
+        c.setRadius(1f);
+        sobj.attachComponent(c);
         return sobj;
     }
 
@@ -123,10 +121,7 @@ public class StarLoader {
     private GVRMesh getStarMesh(GVRContext context) {
         if (starMesh == null) {
             starMesh = new GVRMesh(context);
-            starMesh.setVertices(new float[]{-5f, -4.5f, 0f, 0f, 5.5f, 0f, 5f, -4.5f, 0f});
-            starMesh.setNormals(new float[]{0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f});
-            starMesh.setTexCoords(new float[]{0f, 0f, 0.5f, 0.8f, 1f, 0f});
-            starMesh.setIndices(new char[]{0, 2, 1});
+            starMesh.setVertices(new float[]{-1f, -1f, 0f, 1f, 1f, 0f});
         }
         return starMesh;
     }
