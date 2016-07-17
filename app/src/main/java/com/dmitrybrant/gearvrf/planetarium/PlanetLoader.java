@@ -72,7 +72,7 @@ public class PlanetLoader {
 
     private static GVRMesh getPlanetMesh(GVRContext context) throws IOException {
         if (planetMesh == null) {
-            planetMesh = context.loadMesh(new GVRAndroidResource(context, "sphere.obj"));
+            planetMesh = SphereMesh.createSphereMesh(context, 1f, 16, 16, false);
         }
         return planetMesh;
     }

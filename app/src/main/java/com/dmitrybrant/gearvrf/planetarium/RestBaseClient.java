@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 public class RestBaseClient {
     public static final String TAG = "RestBaseServer";
-    private static final String BASE_URL = "https://rest.wikimedia.org/en.wikipedia.org/v1/page/mobile-text/";
+    private static final String BASE_URL = "https://en.wikipedia.org/api/rest_v1/page/mobile-text/";
 
     public interface OnGetPageResult {
         void onSuccess(String pageContents);
