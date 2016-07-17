@@ -1,4 +1,4 @@
-/* Copyright 2015 Dmitry Brant
+/* Copyright 2016 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,8 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        return viewManager.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return viewManager.handleKeyEvent(event) || super.onKeyUp(keyCode, event);
     }
 
     public WebView getWebView() {

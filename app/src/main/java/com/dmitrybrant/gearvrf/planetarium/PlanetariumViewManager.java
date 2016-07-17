@@ -328,7 +328,7 @@ public class PlanetariumViewManager extends GVRScript {
                 0, (float) -Math.sin(Math.toRadians(ra)), 0, 0, 0);
     }
 
-    public boolean dispatchKeyEvent(KeyEvent event) {
+    public boolean handleKeyEvent(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
             //takeScreenshot();
         }

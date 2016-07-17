@@ -1,4 +1,4 @@
-/* Copyright 2015 Dmitry Brant
+/* Copyright 2016 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class StarLoader {
 
     public GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
         GVRSceneObject sobj = new GVRSceneObject(context, getStarMesh(context));
-        float scale = 6.0f;
+        final float scale = 6.0f;
         obj.sceneObj = sobj;
         obj.initialScale = scale;
         sobj.getTransform().setScale(scale, scale, scale);
