@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.gearvrf.FutureWrapper;
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRLight;
@@ -126,15 +125,14 @@ public class PlanetariumViewManager extends GVRScript {
         rootObject.addChildObject(SkyLoader.createSceneObject(gvrContext, RENDER_ORDER_MILKY_WAY));
 
         // head-tracking pointer
-        GVRSceneObject headTracker = new GVRSceneObject(gvrContext,
-                new FutureWrapper<>(gvrContext.createQuad(1f, 1f)),
-                gvrContext.loadFutureTexture(new GVRAndroidResource(
-                        gvrContext, R.drawable.headtrack)));
+        GVRSceneObject headTracker = new GVRSceneObject(gvrContext, gvrContext.createQuad(1f, 1f),
+                gvrContext.loadTexture(new GVRAndroidResource(gvrContext, R.drawable.headtrack)));
         headTracker.getTransform().setPosition(0.0f, 0.0f, -50.0f);
         headTracker.getRenderData().setDepthTest(false);
         headTracker.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
         mMainScene.getMainCameraRig().addChildObject(headTracker);
-        mMainScene.setStatsEnabled(true);
+
+        //mMainScene.setStatsEnabled(true);
 
         // text view...
         textView = new GVRTextViewSceneObject(gvrContext, 4f, 2f, "");
@@ -143,7 +141,7 @@ public class PlanetariumViewManager extends GVRScript {
         textView.setText("");
         textView.setTextColor(Color.CYAN);
         textView.setGravity(Gravity.CENTER);
-        textView.setRefreshFrequency(GVRTextViewSceneObject.IntervalFrequency.LOW);
+        textView.setRefreshFrequency(GVRTextViewSceneObject.IntervalFrequency.HIGH);
         textView.getRenderData().setDepthTest(false);
         textView.getRenderData().setRenderingOrder(RENDER_ORDER_UI + 1);
         mMainScene.getMainCameraRig().addChildObject(textView);
@@ -252,9 +250,9 @@ public class PlanetariumViewManager extends GVRScript {
                 GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
                 unzoomAnimationList.add(unanim);
             } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
-                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale * 4f);
+                GVRScaleAnimation anim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.5f, obj.initialScale * 8f);
                 anim.start(mAnimationEngine);
-                GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.3f, obj.initialScale);
+                GVRScaleAnimation unanim = new GVRScaleAnimation(pickedObject.getHitObject(), 0.5f, obj.initialScale);
                 unzoomAnimationList.add(unanim);
             }
         }
