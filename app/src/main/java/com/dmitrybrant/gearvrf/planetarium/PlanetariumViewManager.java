@@ -52,7 +52,6 @@ public class PlanetariumViewManager extends GVRScript {
     private static final String TAG = Log.tag(PlanetariumViewManager.class);
     private static final int RENDER_ORDER_UI = 100000;
     private static final int RENDER_ORDER_PLANET = 99900;
-    private static final int RENDER_ORDER_STAR = 2000;
     private static final int RENDER_ORDER_ASTERISM = 1000;
     private static final int RENDER_ORDER_NEBULA = 100;
     private static final int RENDER_ORDER_MILKY_WAY = 0;
@@ -65,7 +64,8 @@ public class PlanetariumViewManager extends GVRScript {
     private GVRSceneObject rootObject;
 
     private List<SkyObject> skyObjectList = new ArrayList<>();
-    AsterismLoader asterismLoader;
+    private StarLoader starLoader;
+    private AsterismLoader asterismLoader;
 
     private List<GVRAnimation> continuousAnimationList = new ArrayList<>();
     private List<GVRAnimation> unzoomAnimationList = new ArrayList<>();
@@ -90,7 +90,7 @@ public class PlanetariumViewManager extends GVRScript {
         Collections.sort(planetObjectList, new Comparator<SkyObject>() {
             @Override
             public int compare(SkyObject lhs, SkyObject rhs) {
-                return lhs.dist < rhs.dist ? -1 : lhs.dist > rhs.dist ? 1 : 0;
+                return Float.compare(lhs.dist, rhs.dist);
             }
         });
         skyObjectList.addAll(planetObjectList);
@@ -100,8 +100,8 @@ public class PlanetariumViewManager extends GVRScript {
         asterismLoader = new AsterismLoader();
         asterismLoader.loadAsterisms(mActivity, skyObjectList);
 
-        StarLoader starLoader = new StarLoader();
-        starLoader.loadStars(mActivity, skyObjectList);
+        starLoader = new StarLoader(mActivity);
+        skyObjectList.addAll(starLoader.getStarList());
 
         mMainScene = gvrContext.getNextMainScene(new Runnable() {
             @Override
@@ -134,7 +134,7 @@ public class PlanetariumViewManager extends GVRScript {
 
         //mMainScene.setStatsEnabled(true);
 
-        // text view...
+        // TextView...
         textView = new GVRTextViewSceneObject(gvrContext, 4f, 2f, "");
         textView.getTransform().setPosition(0.0f, 1.5f, -10.0f);
         textView.setTextSize(textView.getTextSize() / 4);
@@ -146,13 +146,12 @@ public class PlanetariumViewManager extends GVRScript {
         textView.getRenderData().setRenderingOrder(RENDER_ORDER_UI + 1);
         mMainScene.getMainCameraRig().addChildObject(textView);
 
-        // web view...
+        // WebView...
         webViewObject = new GVRWebViewSceneObject(gvrContext, 5f, 8f, mActivity.getWebView());
         webViewObject.getRenderData().getMaterial().setOpacity(1.0f);
         webViewObject.getTransform().setPosition(0.0f, -5.0f, -12.0f);
         webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
 
-        // light!
         GVRLight mLight = new GVRLight(gvrContext);
         mLight.setAmbientIntensity(0.5f, 0.5f, 0.5f, 1.0f);
         mLight.setDiffuseIntensity(1.0f, 1.0f, 1.0f, 1.0f);
@@ -163,11 +162,6 @@ public class PlanetariumViewManager extends GVRScript {
             if (obj.type == SkyObject.TYPE_STAR) {
 
                 asterismLoader.addStar(obj);
-                if (obj.mag <= StarLoader.MAX_STAR_MAGNITUDE) {
-                    GVRSceneObject sobj = starLoader.createSceneObject(gvrContext, obj, Integer.toString(i));
-                    setObjectPosition(sobj, obj.ra, obj.dec, StarLoader.DEFAULT_DISTANCE_STAR);
-                    rootObject.addChildObject(sobj);
-                }
 
             } else if (obj.type == SkyObject.TYPE_NEBULA || obj.type == SkyObject.TYPE_OTHER) {
 
@@ -221,8 +215,18 @@ public class PlanetariumViewManager extends GVRScript {
             asterism.setPassive();
         }
 
-        String text = "";
         boolean haveNamedObject = false;
+        String text = "";
+
+        float[] lookAt = mMainScene.getMainCameraRig().getLookAt();
+        double dec = Math.toDegrees(Math.asin(lookAt[1]));
+        double ra = Math.toDegrees(Math.PI + Math.atan2(lookAt[0], lookAt[2]));
+        SkyObject pickedStar = starLoader.pickStar(ra, dec);
+        if (pickedStar != null) {
+            haveNamedObject = true;
+            text = pickedStar.name;
+        }
+
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
             SkyObject obj = skyObjectList.get(Integer.parseInt(pickedObject.getHitObject().getName()));
 
@@ -344,7 +348,7 @@ public class PlanetariumViewManager extends GVRScript {
         if (Math.abs(scrollX) > Math.abs(scrollY)) {
             // horizontal scroll
             if (rootObject != null) {
-                rootObject.getTransform().rotateByAxis(scrollX / 5f, 0f, 1f, 0f);
+                mMainScene.getMainCameraRig().getTransform().rotateByAxis(-scrollX / 5f, 0f, 1f, 0f);
             }
         }
     }

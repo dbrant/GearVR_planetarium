@@ -21,36 +21,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.gearvrf.GVRContext;
-import org.gearvrf.GVRMesh;
-import org.gearvrf.GVRSceneObject;
-import org.gearvrf.GVRSphereCollider;
 import org.gearvrf.utility.Log;
 
 public class StarLoader {
     private static final String TAG = "StarLoader";
-    public static final float MAX_STAR_MAGNITUDE = 5f;
+    public static final float MAX_STAR_MAGNITUDE = 7f;
     public static final float DEFAULT_DISTANCE_STAR = 500f;
+    private static final double STAR_PICK_RADIUS = 0.5;
 
-    private static GVRMesh starMesh;
+    private List<SkyObject> starList = new ArrayList<>();
 
-    public GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name) {
-        GVRSceneObject sobj = new GVRSceneObject(context, getStarMesh(context));
-        final float scale = 6.0f;
-        obj.sceneObj = sobj;
-        obj.initialScale = scale;
-        sobj.getTransform().setScale(scale, scale, scale);
-        sobj.setName(name);
-
-        GVRSphereCollider c = new GVRSphereCollider(context);
-        c.setRadius(1f);
-        sobj.attachComponent(c);
-        return sobj;
-    }
-
-    public void loadStars(Context context, List<SkyObject> starList) {
+    public StarLoader(Context context) {
         InputStream instream = null;
         try {
             Log.d(TAG, "Loading stars...");
@@ -119,13 +105,45 @@ public class StarLoader {
                 }
             }
         }
+
+        //sort them by RA
+        Collections.sort(starList, new Comparator<SkyObject>() {
+            @Override
+            public int compare(SkyObject lhs, SkyObject rhs) {
+                return Double.compare(lhs.ra, rhs.ra);
+            }
+        });
     }
 
-    private GVRMesh getStarMesh(GVRContext context) {
-        if (starMesh == null) {
-            starMesh = new GVRMesh(context);
-            starMesh.setVertices(new float[]{-1f, -1f, 0f, 1f, 1f, 0f});
+    public List<SkyObject> getStarList() {
+        return starList;
+    }
+
+    public SkyObject pickStar(double ra, double dec) {
+        double numStars = starList.size();
+        int i, j = (int) ((ra / 360.0) * numStars);
+        if (j >= starList.size()) { j = starList.size() - 1; }
+        if (j < 0) { j = 0; }
+        i = j;
+        while (i >= 0) {
+            if (ra - starList.get(i).ra > STAR_PICK_RADIUS) {
+                break;
+            }
+            if (Math.abs(starList.get(i).dec - dec) <= STAR_PICK_RADIUS) {
+                return starList.get(i);
+            }
+            i--;
         }
-        return starMesh;
+        i = j;
+        while (i < starList.size()) {
+            if (starList.get(i).ra - ra > STAR_PICK_RADIUS) {
+                break;
+            }
+            if (Math.abs(starList.get(i).dec - dec) <= STAR_PICK_RADIUS) {
+                return starList.get(i);
+            }
+            i++;
+        }
+        return null;
     }
 }

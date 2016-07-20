@@ -151,9 +151,13 @@ public class Asterism {
                 Log.w(TAG, "Orphan asterism node: " + node.getHipNum());
                 continue;
             }
-            vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionX();
-            vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionY();
-            vertices[vertexPos++] = node.getStar().sceneObj.getTransform().getPositionZ();
+
+            double ra = Math.toRadians(node.getStar().ra - 180.0);
+            double dec = Math.toRadians(node.getStar().dec);
+
+            vertices[vertexPos++] = (float) ((StarLoader.DEFAULT_DISTANCE_STAR * Math.cos(dec)) * Math.sin(ra));
+            vertices[vertexPos++] = (float) (StarLoader.DEFAULT_DISTANCE_STAR * Math.sin(dec));
+            vertices[vertexPos++] = (float) ((StarLoader.DEFAULT_DISTANCE_STAR * Math.cos(dec)) * Math.cos(ra));
         }
         for (int i = 0; i < indices.length; i++) {
             indices[i] = (char) i;
