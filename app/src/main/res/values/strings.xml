@@ -1,19 +1,5 @@
 <resources>
     <string name="app_name">Planetarium</string>
-    <string name="m1">Crab Nebula</string>
-    <string name="m8">Lagoon Nebula</string>
-    <string name="m13">Hercules Cluster</string>
-    <string name="m16">Eagle Nebula</string>
-    <string name="m27">Dumbbell Nebula</string>
-    <string name="m31">Andromeda Galaxy</string>
-    <string name="m42">Orion Nebula</string>
-    <string name="m51">Whirlpool Galaxy</string>
-    <string name="m57">Ring Nebula</string>
-    <string name="m63">Sunflower Galaxy</string>
-    <string name="m101">Pinwheel Galaxy</string>
-    <string name="m104">Sombrero Galaxy</string>
-    <string name="eta_carinae">Eta Carinae</string>
-    <string name="ic443">IC 443</string>
     <string name="sun">Sun</string>
     <string name="moon">Moon</string>
     <string name="mercury">Mercury</string>

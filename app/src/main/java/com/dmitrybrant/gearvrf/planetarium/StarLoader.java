@@ -61,6 +61,9 @@ public class StarLoader {
             buffreader.readLine();
             while ((line = buffreader.readLine()) != null) {
                 lineArr = line.split("\\s+");
+                if (lineArr.length < 6) {
+                    continue;
+                }
 
                 SkyObject s = new SkyObject();
                 starList.add(s);
