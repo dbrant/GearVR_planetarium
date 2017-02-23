@@ -39,7 +39,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
         super.onCreate(icicle);
         createWebView();
         planetariumMain = new PlanetariumMain(this);
-        setMain(planetariumMain);
+        setMain(planetariumMain, "gvr_note4.xml");
         mGestureDetector = new VRTouchPadGestureDetector(this);
     }
 
