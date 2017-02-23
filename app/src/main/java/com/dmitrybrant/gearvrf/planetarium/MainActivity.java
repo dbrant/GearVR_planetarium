@@ -1,4 +1,4 @@
-/* Copyright 2016 Dmitry Brant
+/* Copyright 2016-2017 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import org.gearvrf.GVRActivity;
 import org.gearvrf.utility.Log;
 
 public class MainActivity extends GVRActivity implements VRTouchPadGestureDetector.OnTouchPadGestureListener {
-    private static final String TAG = Log.tag(PlanetariumViewManager.class);
+    private static final String TAG = Log.tag(MainActivity.class);
 
     private static final int TAP_INTERVAL = 300;
     private long mLatestTap = 0;
 
-    private PlanetariumViewManager viewManager;
+    private PlanetariumMain planetariumMain;
     private WebView mWebView;
     private VRTouchPadGestureDetector mGestureDetector;
 
@@ -38,14 +38,14 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         createWebView();
-        viewManager = new PlanetariumViewManager(this);
+        planetariumMain = new PlanetariumMain(this);
+        setMain(planetariumMain);
         mGestureDetector = new VRTouchPadGestureDetector(this);
-        setScript(viewManager, "gvr_note4.xml");
     }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        return viewManager.handleKeyEvent(event) || super.onKeyUp(keyCode, event);
+        return planetariumMain.handleKeyEvent(event) || super.onKeyUp(keyCode, event);
     }
 
     public WebView getWebView() {
@@ -111,7 +111,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
     public boolean onSingleTap(MotionEvent e) {
         if (System.currentTimeMillis() > mLatestTap + TAP_INTERVAL) {
             mLatestTap = System.currentTimeMillis();
-            viewManager.onTap();
+            planetariumMain.onTap();
         }
         return false;
     }
@@ -128,7 +128,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
 
     @Override
     public void onScroll(float scrollX, float scrollY) {
-        viewManager.onScroll(scrollX, scrollY);
+        planetariumMain.onScroll(scrollX, scrollY);
         /*
         if (Math.abs(scrollY) > Math.abs(scrollX)) {
             int scrollAmount = (int) scrollY;

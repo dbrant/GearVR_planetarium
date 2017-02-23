@@ -1,4 +1,4 @@
-/* Copyright 2015 Dmitry Brant
+/* Copyright 2015-2017 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.gearvrf.GVRAndroidResource;
+import org.gearvrf.GVRAssetLoader;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRLight;
+import org.gearvrf.GVRMain;
 import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScreenshotCallback;
-import org.gearvrf.GVRScript;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
@@ -48,8 +49,8 @@ import org.gearvrf.scene_objects.GVRTextViewSceneObject;
 import org.gearvrf.scene_objects.GVRWebViewSceneObject;
 import org.gearvrf.utility.Log;
 
-public class PlanetariumViewManager extends GVRScript {
-    private static final String TAG = Log.tag(PlanetariumViewManager.class);
+public class PlanetariumMain extends GVRMain {
+    private static final String TAG = Log.tag(PlanetariumMain.class);
     private static final int RENDER_ORDER_UI = 100000;
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_ASTERISM = 1000;
@@ -76,7 +77,7 @@ public class PlanetariumViewManager extends GVRScript {
     private boolean webViewVisible;
     private boolean webViewAdded;
 
-    PlanetariumViewManager(MainActivity activity) {
+    PlanetariumMain(MainActivity activity) {
         mActivity = activity;
     }
 
@@ -103,15 +104,7 @@ public class PlanetariumViewManager extends GVRScript {
         starLoader = new StarLoader(mActivity);
         skyObjectList.addAll(starLoader.getStarList());
 
-        mMainScene = gvrContext.getNextMainScene(new Runnable() {
-            @Override
-            public void run() {
-                for (GVRAnimation animation : continuousAnimationList) {
-                    animation.start(mAnimationEngine);
-                }
-                continuousAnimationList = null;
-            }
-        });
+        mMainScene = gvrContext.getMainScene();
 
         mMainScene.setFrustumCulling(true);
         mMainScene.getMainCameraRig().getLeftCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -124,15 +117,17 @@ public class PlanetariumViewManager extends GVRScript {
         // sky background
         rootObject.addChildObject(SkyLoader.createSceneObject(gvrContext, RENDER_ORDER_MILKY_WAY));
 
+        GVRAssetLoader assetLoader = new GVRAssetLoader(gvrContext);
+
         // head-tracking pointer
         GVRSceneObject headTracker = new GVRSceneObject(gvrContext, gvrContext.createQuad(1f, 1f),
-                gvrContext.loadTexture(new GVRAndroidResource(gvrContext, R.drawable.headtrack)));
+                assetLoader.loadTexture(new GVRAndroidResource(gvrContext, R.drawable.headtrack)));
         headTracker.getTransform().setPosition(0.0f, 0.0f, -50.0f);
         headTracker.getRenderData().setDepthTest(false);
         headTracker.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
         mMainScene.getMainCameraRig().addChildObject(headTracker);
 
-        //mMainScene.setStatsEnabled(true);
+        mMainScene.setStatsEnabled(true);
 
         // TextView...
         textView = new GVRTextViewSceneObject(gvrContext, 4f, 2f, "");
