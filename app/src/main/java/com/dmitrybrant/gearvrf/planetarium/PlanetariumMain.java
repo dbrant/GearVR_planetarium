@@ -54,7 +54,7 @@ public class PlanetariumMain extends GVRMain {
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_ASTERISM = 1000;
     private static final int RENDER_ORDER_NEBULA = 100;
-    private static final int RENDER_ORDER_MILKY_WAY = 99;
+    private static final int RENDER_ORDER_MILKY_WAY = 0;
 
     private static final float CAMERA_X = 0f;
     private static final float CAMERA_Y = 0f;
@@ -153,6 +153,8 @@ public class PlanetariumMain extends GVRMain {
         mLight.setDiffuseIntensity(1.0f, 1.0f, 1.0f, 1.0f);
         mLight.setSpecularIntensity(1.0f, 1.0f, 1.0f, 1.0f);
 
+        // TODO: rootObject.attachLight(mLight);
+
         for (int i = 0; i < skyObjectList.size(); i++) {
             SkyObject obj = skyObjectList.get(i);
             if (obj.type == SkyObject.TYPE_STAR) {
@@ -168,7 +170,7 @@ public class PlanetariumMain extends GVRMain {
 
             } else if (obj.type == SkyObject.TYPE_PLANET) {
 
-                GVRSceneObject sobj = PlanetLoader.createSceneObject(gvrContext, obj, Integer.toString(i), RENDER_ORDER_PLANET - i, mLight);
+                GVRSceneObject sobj = PlanetLoader.createSceneObject(gvrContext, obj, Integer.toString(i), RENDER_ORDER_PLANET - i);
                 rootObject.addChildObject(sobj);
                 setObjectPosition(sobj, obj.ra, obj.dec, PlanetLoader.DEFAULT_DISTANCE_PLANET);
 

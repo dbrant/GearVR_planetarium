@@ -23,9 +23,7 @@ import com.mhuss.AstroLib.Planets;
 
 import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
-import org.gearvrf.GVRLight;
 import org.gearvrf.GVRMesh;
-import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRSceneObject;
 
 import java.io.IOException;
@@ -37,7 +35,7 @@ public class PlanetLoader {
 
     private static GVRMesh planetMesh;
 
-    public static GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name, int renderOrder, GVRLight light) throws IOException {
+    public static GVRSceneObject createSceneObject(GVRContext context, SkyObject obj, String name, int renderOrder) throws IOException {
         GVRSceneObject planetRevolutionObject = new GVRSceneObject(context);
         obj.sceneObj = planetRevolutionObject;
 
@@ -57,9 +55,8 @@ public class PlanetLoader {
 
         // TODO: implement correct lighting
         if (!obj.name.equals("Sun")) {
-            //planetMeshObject.attachLight(light);
             //planetMeshObject.getRenderData().enableLight();
-            planetMeshObject.getRenderData().getMaterial().setColor(0.5f, 0.5f, 0.5f);
+            planetMeshObject.getRenderData().getMaterial().setColor(1f, 1f, 1f);
             planetMeshObject.getRenderData().getMaterial().setOpacity(1.0f);
             planetMeshObject.getRenderData().getMaterial().setAmbientColor(0.1f, 0.1f, 0.1f, 1.0f);
             planetMeshObject.getRenderData().getMaterial().setDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
