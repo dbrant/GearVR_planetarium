@@ -240,9 +240,6 @@ public class PlanetariumMain extends GVRMain {
                 continue;
             }
 
-            if (haveNamedObject) {
-                continue;
-            }
             haveNamedObject = true;
             text = obj.name;
 
@@ -287,6 +284,12 @@ public class PlanetariumMain extends GVRMain {
             return;
         }
         webViewVisible = false;
+
+        float[] lookAt = mMainScene.getMainCameraRig().getLookAt();
+        double dec = Math.toDegrees(Math.asin(lookAt[1]));
+        double ra = Math.toDegrees(Math.PI + Math.atan2(lookAt[0], lookAt[2]));
+        SkyObject pickedObj = starLoader.pickStar(ra, dec);
+
         for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.pickObjects(mContext.getMainScene(), CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_X, CAMERA_Y, CAMERA_Z - 1000f)) {
             String objName = pickedObject.getHitObject().getName();
             SkyObject obj = skyObjectList.get(Integer.parseInt(objName));
@@ -295,18 +298,22 @@ public class PlanetariumMain extends GVRMain {
                 continue;
             }
 
-            mActivity.loadWebPageForObject(obj);
+            pickedObj = obj;
+            // only care about the first picked object
+            break;
+        }
+
+        if (pickedObj != null) {
+            mActivity.loadWebPageForObject(pickedObj);
             webViewVisible = true;
 
             webViewObject.getTransform().setPosition(0f, 0f, 0f);
             webViewObject.getTransform().setRotationByAxis(0f, 0f, 0f, 1f);
             webViewObject.getTransform().setRotationByAxis(0f, 0f, 1f, 0f);
             webViewObject.getTransform().setRotationByAxis(0f, 1f, 0f, 0f);
-            setObjectPosition(webViewObject, obj.ra - 20f, obj.dec, 12f);
-
-            // only care about the first picked object
-            break;
+            setObjectPosition(webViewObject, pickedObj.ra - 20f, pickedObj.dec, 12f);
         }
+
         updateWebViewVisible();
     }
 
