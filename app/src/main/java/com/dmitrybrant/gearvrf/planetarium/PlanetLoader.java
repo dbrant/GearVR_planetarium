@@ -25,6 +25,7 @@ import org.gearvrf.GVRAndroidResource;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRLight;
 import org.gearvrf.GVRMesh;
+import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRSceneObject;
 
 import java.io.IOException;
@@ -56,12 +57,12 @@ public class PlanetLoader {
 
         // TODO: implement correct lighting
         if (!obj.name.equals("Sun")) {
+            //planetMeshObject.attachLight(light);
+            //planetMeshObject.getRenderData().enableLight();
             planetMeshObject.getRenderData().getMaterial().setColor(0.5f, 0.5f, 0.5f);
             planetMeshObject.getRenderData().getMaterial().setOpacity(1.0f);
             planetMeshObject.getRenderData().getMaterial().setAmbientColor(0.1f, 0.1f, 0.1f, 1.0f);
             planetMeshObject.getRenderData().getMaterial().setDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-            planetMeshObject.attachLight(light);
-            planetMeshObject.getRenderData().enableLight();
         }
 
         if (obj.name.equals("Moon")) {

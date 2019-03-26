@@ -45,9 +45,9 @@ ext.gearvrfVersion='4.0.1-SNAPSHOT'
 dependencies {
 
     implementation "com.google.code.gson:gson:2.8.5"
-    implementation "org.gearvrf:framework:4.0.0"
-    implementation "org.gearvrf:backend_daydream:4.0.0"
-    implementation "org.gearvrf:backend_oculus:4.0.0"
+    implementation "org.gearvrf:framework:$gearvrfVersion"
+    implementation "org.gearvrf:backend_daydream:$gearvrfVersion"
+    implementation "org.gearvrf:backend_oculus:$gearvrfVersion"
     implementation "com.google.vr:sdk-base:1.180.0"
     implementation "com.google.vr:sdk-controller:1.180.0"
 

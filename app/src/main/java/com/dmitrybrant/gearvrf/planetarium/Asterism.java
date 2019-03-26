@@ -22,14 +22,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.opengl.GLES20;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gearvrf.GVRBitmapTexture;
+import org.gearvrf.GVRBitmapImage;
 import org.gearvrf.GVRContext;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMesh;
+import org.gearvrf.GVRRenderData;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRTexture;
 import org.gearvrf.utility.Log;
@@ -64,7 +64,7 @@ public class Asterism {
         this.labelObject = object;
     }
 
-    public Asterism(String line, SkyObject skyObject) throws IOException {
+    public Asterism(String line, SkyObject skyObject) {
         this.skyObject = skyObject;
         String[] lineArr = line.split("\\s+");
         name = Util.bayerExToFullName(Util.bayerToFullName(lineArr[0]));
@@ -78,14 +78,16 @@ public class Asterism {
     public GVRSceneObject createSceneObject(GVRContext context) {
         GVRMaterial material = new GVRMaterial(context, GVRMaterial.GVRShaderType.Phong.ID);
         material.setDiffuseColor(0, 0, 1f, 1f);
-        material.setLineWidth(10.0f);
-        GVRMesh mesh = createMesh(context);
-        GVRSceneObject asterismObj = new GVRSceneObject(context, mesh);
-        asterismObj.getRenderData().setMaterial(material);
-        asterismObj.getRenderData().setDepthTest(false);
-        asterismObj.getRenderData().setDrawMode(GLES20.GL_LINES);
-        skyObject.sceneObj = asterismObj;
-        return asterismObj;
+        material.setLineWidth(2.0f);
+        GVRSceneObject obj = new GVRSceneObject(context);
+        GVRRenderData rd = new GVRRenderData(context);
+        rd.setMesh(createMesh(context));
+        rd.setDrawMode(GLES20.GL_LINES);
+        rd.setMaterial(material);
+        rd.setDepthTest(false);
+        obj.attachRenderData(rd);
+        skyObject.sceneObj = obj;
+        return obj;
     }
 
     public GVRSceneObject createLabelObject(GVRContext gvrContext, Context context) {
@@ -104,7 +106,7 @@ public class Asterism {
 
         float aspect = (float) bounds.width() / (float) bounds.height();
         GVRTexture texture = new GVRTexture(gvrContext);
-        texture.setImage(new GVRBitmapTexture(gvrContext, bmp));
+        texture.setImage(new GVRBitmapImage(gvrContext, bmp));
         GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH * widthScale, LABEL_WIDTH * widthScale / aspect), texture);
         sobj.getRenderData().setDepthTest(false);
         sobj.getRenderData().getMaterial().setOpacity(OPACITY_PASSIVE);
@@ -143,7 +145,6 @@ public class Asterism {
 
     private GVRMesh createMesh(GVRContext context) {
         float[] vertices = new float[nodes.size() * 3];
-        char[] indices = new char[nodes.size()];
         int vertexPos = 0;
         GVRMesh mesh = new GVRMesh(context);
         for(AsterismNode node : nodes) {
@@ -159,11 +160,7 @@ public class Asterism {
             vertices[vertexPos++] = (float) (StarLoader.DEFAULT_DISTANCE_STAR * Math.sin(dec));
             vertices[vertexPos++] = (float) ((StarLoader.DEFAULT_DISTANCE_STAR * Math.cos(dec)) * Math.cos(ra));
         }
-        for (int i = 0; i < indices.length; i++) {
-            indices[i] = (char) i;
-        }
         mesh.setVertices(vertices);
-        mesh.setIndices(indices);
         return mesh;
     }
 

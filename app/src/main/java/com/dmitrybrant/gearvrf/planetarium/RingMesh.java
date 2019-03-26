@@ -1,4 +1,4 @@
-/* Copyright 2015 Dmitry Brant
+/* Copyright 2015-2019 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ public class RingMesh {
         mesh.setVertices(vertices);
         mesh.setTexCoords(texCoords);
         mesh.setNormals(normals);
-        mesh.setTriangles(indices);
+        mesh.setIndices(indices);
         return mesh;
     }
 }

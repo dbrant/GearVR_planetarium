@@ -31,11 +31,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.gearvrf.GVRAndroidResource;
-import org.gearvrf.GVRAssetLoader;
 import org.gearvrf.GVRContext;
-import org.gearvrf.GVRLight;
 import org.gearvrf.GVRMain;
 import org.gearvrf.GVRPicker;
+import org.gearvrf.GVRPointLight;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
 import org.gearvrf.GVRScreenshotCallback;
@@ -55,7 +54,11 @@ public class PlanetariumMain extends GVRMain {
     private static final int RENDER_ORDER_PLANET = 99900;
     private static final int RENDER_ORDER_ASTERISM = 1000;
     private static final int RENDER_ORDER_NEBULA = 100;
-    private static final int RENDER_ORDER_MILKY_WAY = 0;
+    private static final int RENDER_ORDER_MILKY_WAY = 99;
+
+    private static final float CAMERA_X = 0f;
+    private static final float CAMERA_Y = 0f;
+    private static final float CAMERA_Z = 0f;
 
     private MainActivity mActivity;
     private GVRContext mContext;
@@ -109,7 +112,7 @@ public class PlanetariumMain extends GVRMain {
         mMainScene.setFrustumCulling(true);
         mMainScene.getMainCameraRig().getLeftCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
         mMainScene.getMainCameraRig().getRightCamera().setBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
-        mMainScene.getMainCameraRig().getTransform().setPosition(0.0f, 0.0f, 0.0f);
+        mMainScene.getMainCameraRig().getTransform().setPosition(CAMERA_X, CAMERA_Y, CAMERA_Z);
 
         rootObject = new GVRSceneObject(gvrContext);
         mMainScene.addSceneObject(rootObject);
@@ -117,11 +120,9 @@ public class PlanetariumMain extends GVRMain {
         // sky background
         rootObject.addChildObject(SkyLoader.createSceneObject(gvrContext, RENDER_ORDER_MILKY_WAY));
 
-        GVRAssetLoader assetLoader = new GVRAssetLoader(gvrContext);
-
         // head-tracking pointer
         GVRSceneObject headTracker = new GVRSceneObject(gvrContext, gvrContext.createQuad(1f, 1f),
-                assetLoader.loadTexture(new GVRAndroidResource(gvrContext, R.drawable.headtrack)));
+                gvrContext.getAssetLoader().loadTexture(new GVRAndroidResource(gvrContext, R.drawable.headtrack)));
         headTracker.getTransform().setPosition(0.0f, 0.0f, -50.0f);
         headTracker.getRenderData().setDepthTest(false);
         headTracker.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
@@ -147,7 +148,7 @@ public class PlanetariumMain extends GVRMain {
         webViewObject.getTransform().setPosition(0.0f, -5.0f, -12.0f);
         webViewObject.getRenderData().setRenderingOrder(RENDER_ORDER_UI);
 
-        GVRLight mLight = new GVRLight(gvrContext);
+        GVRPointLight mLight = new GVRPointLight(gvrContext);
         mLight.setAmbientIntensity(0.5f, 0.5f, 0.5f, 1.0f);
         mLight.setDiffuseIntensity(1.0f, 1.0f, 1.0f, 1.0f);
         mLight.setSpecularIntensity(1.0f, 1.0f, 1.0f, 1.0f);
@@ -176,8 +177,10 @@ public class PlanetariumMain extends GVRMain {
                 }
 
                 if (obj.name.equals("Sun")) {
+
                     // let there be light
-                    //mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
+                    mLight.setPosition(sobj.getTransform().getPositionX(), sobj.getTransform().getPositionY(), sobj.getTransform().getPositionZ());
+
                 } else if (obj.name.equals("Saturn")) {
                     // put a ring on it
                     PlanetLoader.addRings(gvrContext, obj, 1.5f, 2.3f, -20f, R.drawable.saturn_rings, RENDER_ORDER_PLANET + 1);
@@ -222,7 +225,7 @@ public class PlanetariumMain extends GVRMain {
             text = pickedStar.name;
         }
 
-        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
+        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.pickObjects(mContext.getMainScene(), CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_X, CAMERA_Y, CAMERA_Z - 1000f)) {
             SkyObject obj = skyObjectList.get(Integer.parseInt(pickedObject.getHitObject().getName()));
 
             if (obj.type == SkyObject.TYPE_ASTERISM) {
@@ -282,7 +285,7 @@ public class PlanetariumMain extends GVRMain {
             return;
         }
         webViewVisible = false;
-        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.findObjects(mContext.getMainScene())) {
+        for (GVRPicker.GVRPickedObject pickedObject : GVRPicker.pickObjects(mContext.getMainScene(), CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_X, CAMERA_Y, CAMERA_Z - 1000f)) {
             String objName = pickedObject.getHitObject().getName();
             SkyObject obj = skyObjectList.get(Integer.parseInt(objName));
 
