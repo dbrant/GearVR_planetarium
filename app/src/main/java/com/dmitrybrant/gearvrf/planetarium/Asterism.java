@@ -99,7 +99,7 @@ public class Asterism {
 
         Bitmap bmp = Bitmap.createBitmap(bounds.width() * 3 / 2, bounds.height() * 3 / 2, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bmp);
-        canvas.drawText(name, bmp.getWidth() / 4, bmp.getHeight() * 3 / 4, paint);
+        canvas.drawText(name, bmp.getWidth() / 4f, bmp.getHeight() * 3f / 4f, paint);
 
         final float labelWidthNormal = 120f;
         float widthScale = (float) bounds.width() / labelWidthNormal;

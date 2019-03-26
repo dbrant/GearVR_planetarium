@@ -39,7 +39,7 @@ public class SkyLoader {
         return sceneObj;
     }
 
-    private static GVRMesh getSkyMesh(GVRContext context) throws IOException {
+    private static GVRMesh getSkyMesh(GVRContext context) {
         if (skyMesh == null) {
             skyMesh = SphereMesh.createSphereMesh(context, 1f, 32, 32, true);
         }

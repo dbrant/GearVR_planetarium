@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.gearvrf.utility.Log;
@@ -107,12 +106,7 @@ public class StarLoader {
         }
 
         //sort them by RA
-        Collections.sort(starList, new Comparator<SkyObject>() {
-            @Override
-            public int compare(SkyObject lhs, SkyObject rhs) {
-                return Double.compare(lhs.ra, rhs.ra);
-            }
-        });
+        Collections.sort(starList, (lhs, rhs) -> Double.compare(lhs.ra, rhs.ra));
     }
 
     public List<SkyObject> getStarList() {

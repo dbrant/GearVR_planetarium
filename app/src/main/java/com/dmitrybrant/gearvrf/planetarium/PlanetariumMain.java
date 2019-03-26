@@ -1,4 +1,4 @@
-/* Copyright 2015-2017 Dmitry Brant
+/* Copyright 2015-2019 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.gearvrf.GVRAndroidResource;
@@ -37,7 +36,6 @@ import org.gearvrf.GVRPicker;
 import org.gearvrf.GVRPointLight;
 import org.gearvrf.GVRScene;
 import org.gearvrf.GVRSceneObject;
-import org.gearvrf.GVRScreenshotCallback;
 import org.gearvrf.GVRTransform;
 import org.gearvrf.animation.GVRAnimation;
 import org.gearvrf.animation.GVRAnimationEngine;
@@ -91,12 +89,7 @@ public class PlanetariumMain extends GVRMain {
 
         List<SkyObject> planetObjectList = new ArrayList<>();
         PlanetLoader.loadPlanets(mContext, planetObjectList);
-        Collections.sort(planetObjectList, new Comparator<SkyObject>() {
-            @Override
-            public int compare(SkyObject lhs, SkyObject rhs) {
-                return Float.compare(lhs.dist, rhs.dist);
-            }
-        });
+        Collections.sort(planetObjectList, (lhs, rhs) -> Float.compare(lhs.dist, rhs.dist));
         skyObjectList.addAll(planetObjectList);
         NebulaLoader.loadNebulae(mContext, skyObjectList);
         OtherObjLoader.loadObjects(skyObjectList);
@@ -387,26 +380,23 @@ public class PlanetariumMain extends GVRMain {
     }
 
     private void takeScreenshot() {
-        mContext.captureScreenLeft(new GVRScreenshotCallback() {
-            @Override
-            public void onScreenCaptured(Bitmap bitmap) {
-                try {
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                    int imageIndex = 0;
-                    File f;
-                    String fileName;
-                    do {
-                        fileName = Integer.toString(imageIndex) + ".png";
-                        imageIndex++;
-                    } while ((f = new File(Environment.getExternalStorageDirectory().getPath() + "/" + fileName)).exists());
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                    //mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
-                } catch (Exception e) {
-                    //mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
-                }
+        mContext.captureScreenLeft(bitmap -> {
+            try {
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                int imageIndex = 0;
+                File f;
+                String fileName;
+                do {
+                    fileName = Integer.toString(imageIndex) + ".png";
+                    imageIndex++;
+                } while ((f = new File(Environment.getExternalStorageDirectory().getPath() + "/" + fileName)).exists());
+                FileOutputStream fo = new FileOutputStream(f);
+                fo.write(bytes.toByteArray());
+                fo.close();
+                //mActivity.createVrToastOnUiThread("Saved screen to " + fileName);
+            } catch (Exception e) {
+                //mActivity.createVrToastOnUiThread("Screenshot error: " + e.getMessage());
             }
         });
     }

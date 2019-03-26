@@ -1,4 +1,4 @@
-/* Copyright 2016-2017 Dmitry Brant
+/* Copyright 2016-2019 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,12 +55,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
     public void loadWebPageForObject(final SkyObject obj) {
         loadIntoWebView("Loading...");
         if (obj.type == SkyObject.TYPE_OTHER) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mWebView.loadUrl("file:///android_asset/about.html");
-                }
-            });
+            runOnUiThread(() -> mWebView.loadUrl("file:///android_asset/about.html"));
         } else {
             RestBaseClient.getPage(Util.transformObjectName(obj.name), new RestBaseClient.OnGetPageResult() {
                 @Override
@@ -78,12 +73,7 @@ public class MainActivity extends GVRActivity implements VRTouchPadGestureDetect
     }
 
     private void loadIntoWebView(final String html) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mWebView.loadDataWithBaseURL("https://wikipedia.org", Util.formatAsHtml(html), "text/html", "utf-8", null);
-            }
-        });
+        runOnUiThread(() -> mWebView.loadDataWithBaseURL("https://wikipedia.org", Util.formatAsHtml(html), "text/html", "utf-8", null));
     }
 
     private void createWebView() {

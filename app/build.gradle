@@ -38,6 +38,11 @@ android {
             exclude 'lib/armeabi-v7a/*.so'
         }
     }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 ext.gearvrfVersion='4.0.1-SNAPSHOT'
