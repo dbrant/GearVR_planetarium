@@ -48,7 +48,7 @@ public class PlanetLoader {
 
         planetRotationObject.addChildObject(planetMeshObject);
         planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
-        planetMeshObject.getRenderData().setDepthTest(false);
+        planetMeshObject.getRenderData().setDepthTest(true);
         planetMeshObject.getRenderData().setRenderingOrder(renderOrder);
         planetMeshObject.setPickingEnabled(true);
         planetMeshObject.setName(name);
@@ -82,9 +82,12 @@ public class PlanetLoader {
         ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
         ringObj.getRenderData().setDepthTest(true);
         ringObj.getRenderData().setRenderingOrder(renderOrder);
-        obj.sceneObj.getChildByIndex(0).getChildByIndex(0).getRenderData().setDepthTest(true);
+
+        ringObj.getRenderData().getMaterial().setColor(1f, 1f, 1f);
+        ringObj.getRenderData().getMaterial().setOpacity(1.0f);
+
         obj.sceneObj.getChildByIndex(0).getChildByIndex(0).addChildObject(ringObj);
-        obj.sceneObj.getTransform().rotateByAxis(rotation, 1f, 0f, 0f);
+        obj.sceneObj.getChildByIndex(0).getChildByIndex(0).getTransform().rotateByAxis(rotation, 1f, 0f, 0f);
     }
 
     public static void loadPlanets(GVRContext context, List<SkyObject> objectList) {

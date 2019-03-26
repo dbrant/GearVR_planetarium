@@ -185,10 +185,10 @@ public class PlanetariumMain extends GVRMain {
 
                 } else if (obj.name.equals("Saturn")) {
                     // put a ring on it
-                    PlanetLoader.addRings(gvrContext, obj, 1.5f, 2.3f, -20f, R.drawable.saturn_rings, RENDER_ORDER_PLANET + 1);
+                    PlanetLoader.addRings(gvrContext, obj, 1.0f, 2.3f, 15f, R.drawable.saturn_rings, RENDER_ORDER_PLANET);
                 } else if (obj.name.equals("Uranus")) {
                     // put a ring on it
-                    PlanetLoader.addRings(gvrContext, obj, 1.3f, 1.6f, 20f, R.drawable.uranus_rings, RENDER_ORDER_PLANET + 1);
+                    PlanetLoader.addRings(gvrContext, obj, 1.3f, 1.6f, -10f, R.drawable.uranus_rings, RENDER_ORDER_PLANET);
                 }
             }
         }
