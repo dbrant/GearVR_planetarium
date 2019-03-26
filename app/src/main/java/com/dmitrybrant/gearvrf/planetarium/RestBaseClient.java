@@ -1,4 +1,4 @@
-/* Copyright 2015 Dmitry Brant
+/* Copyright 2015-2019 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package com.dmitrybrant.gearvrf.planetarium;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class RestBaseClient {
     public static final String TAG = "RestBaseServer";

@@ -45,7 +45,7 @@ public class PlanetLoader {
 
         GVRSceneObject planetMeshObject = new GVRSceneObject(context,
                 getPlanetMesh(context),
-                context.loadTexture(new GVRAndroidResource(context, obj.texName)));
+                context.getAssetLoader().loadTexture(new GVRAndroidResource(context, obj.texName)));
 
         planetRotationObject.addChildObject(planetMeshObject);
         planetMeshObject.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
@@ -60,7 +60,7 @@ public class PlanetLoader {
             planetMeshObject.getRenderData().getMaterial().setOpacity(1.0f);
             planetMeshObject.getRenderData().getMaterial().setAmbientColor(0.1f, 0.1f, 0.1f, 1.0f);
             planetMeshObject.getRenderData().getMaterial().setDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-            planetMeshObject.getRenderData().setLight(light);
+            planetMeshObject.attachLight(light);
             planetMeshObject.getRenderData().enableLight();
         }
 
@@ -79,7 +79,7 @@ public class PlanetLoader {
 
     public static void addRings(GVRContext context, SkyObject obj, float innerRadius, float outerRadius, float rotation, int ringResId, int renderOrder) {
         GVRMesh ringMesh = RingMesh.createRingMesh(context, innerRadius, outerRadius, 32);
-        GVRSceneObject ringObj = new GVRSceneObject(context, ringMesh, context.loadTexture(new GVRAndroidResource(context, ringResId)));
+        GVRSceneObject ringObj = new GVRSceneObject(context, ringMesh, context.getAssetLoader().loadTexture(new GVRAndroidResource(context, ringResId)));
 
         ringObj.getTransform().rotateByAxis(-90f, 1f, 0f, 0f);
         ringObj.getRenderData().setDepthTest(true);

@@ -1,4 +1,4 @@
-/* Copyright 2015 Dmitry Brant
+/* Copyright 2015-2019 Dmitry Brant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.gearvrf.GVRContext;
 import org.gearvrf.GVRMaterial;
 import org.gearvrf.GVRMesh;
 import org.gearvrf.GVRSceneObject;
+import org.gearvrf.GVRTexture;
 import org.gearvrf.utility.Log;
 
 public class Asterism {
@@ -39,8 +40,6 @@ public class Asterism {
     private static final int LABEL_COLOR = 0x80005080;
     private static final float OPACITY_PASSIVE = 0.3f;
     private static final float OPACITY_ACTIVE = 1.0f;
-
-    private static SolidColorShader asterismShader;
 
     private final String name;
     public String getName() {
@@ -77,10 +76,9 @@ public class Asterism {
     }
 
     public GVRSceneObject createSceneObject(GVRContext context) {
-        if (asterismShader == null) {
-            asterismShader = new SolidColorShader(context);
-        }
-        GVRMaterial material = new GVRMaterial(context, asterismShader.getShaderId());
+        GVRMaterial material = new GVRMaterial(context, GVRMaterial.GVRShaderType.Phong.ID);
+        material.setDiffuseColor(0, 0, 1f, 1f);
+        material.setLineWidth(10.0f);
         GVRMesh mesh = createMesh(context);
         GVRSceneObject asterismObj = new GVRSceneObject(context, mesh);
         asterismObj.getRenderData().setMaterial(material);
@@ -105,7 +103,9 @@ public class Asterism {
         float widthScale = (float) bounds.width() / labelWidthNormal;
 
         float aspect = (float) bounds.width() / (float) bounds.height();
-        GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH * widthScale, LABEL_WIDTH * widthScale / aspect), new GVRBitmapTexture(gvrContext, bmp));
+        GVRTexture texture = new GVRTexture(gvrContext);
+        texture.setImage(new GVRBitmapTexture(gvrContext, bmp));
+        GVRSceneObject sobj = new GVRSceneObject(gvrContext, gvrContext.createQuad(LABEL_WIDTH * widthScale, LABEL_WIDTH * widthScale / aspect), texture);
         sobj.getRenderData().setDepthTest(false);
         sobj.getRenderData().getMaterial().setOpacity(OPACITY_PASSIVE);
         return sobj;
@@ -132,12 +132,12 @@ public class Asterism {
     }
 
     public void setActive() {
-        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.1f, 0.20f, 1.0f);
+        skyObject.sceneObj.getRenderData().getMaterial().setDiffuseColor(0, 0.1f, 0.5f, 1f);
         labelObject.getRenderData().getMaterial().setOpacity(Asterism.OPACITY_ACTIVE);
     }
 
     public void setPassive() {
-        skyObject.sceneObj.getRenderData().getMaterial().setVec4(SolidColorShader.COLOR_KEY, 0.0f, 0.02f, 0.1f, 0.5f);
+        skyObject.sceneObj.getRenderData().getMaterial().setDiffuseColor(0, 0.02f, 0.1f, 1f);
         labelObject.getRenderData().getMaterial().setOpacity(Asterism.OPACITY_PASSIVE);
     }
 

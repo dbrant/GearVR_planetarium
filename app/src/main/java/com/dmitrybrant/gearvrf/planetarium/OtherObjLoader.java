@@ -15,8 +15,6 @@
 
 package com.dmitrybrant.gearvrf.planetarium;
 
-import org.gearvrf.GVRContext;
-
 import java.util.List;
 
 public class OtherObjLoader {

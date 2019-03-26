@@ -28,7 +28,7 @@ public class SkyLoader {
     public static GVRSceneObject createSceneObject(GVRContext context, int renderOrder) throws IOException {
         GVRSceneObject sceneObj = new GVRSceneObject(context,
                 getSkyMesh(context),
-                context.loadTexture(new GVRAndroidResource(context, "skymap_8k.jpg")));
+                context.getAssetLoader().loadTexture(new GVRAndroidResource(context, "skymap.jpg")));
 
         sceneObj.getTransform().setScale(500, 500, 500);
         sceneObj.getTransform().setPosition(0, 0, 0);

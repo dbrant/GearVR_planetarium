@@ -39,7 +39,7 @@ public class NebulaLoader {
             nebulaMesh = context.createQuad(10f, 10f);
         }
         GVRSceneObject sobj = new GVRSceneObject(context, nebulaMesh,
-                context.loadTexture(new GVRAndroidResource(context, obj.texResId)));
+                context.getAssetLoader().loadTexture(new GVRAndroidResource(context, obj.texResId)));
         obj.sceneObj = sobj;
         sobj.getRenderData().setDepthTest(false);
         sobj.getTransform().setScale(obj.initialScale, obj.initialScale, obj.initialScale);
