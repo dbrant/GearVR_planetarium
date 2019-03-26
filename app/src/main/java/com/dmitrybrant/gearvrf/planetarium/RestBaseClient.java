@@ -18,7 +18,6 @@ package com.dmitrybrant.gearvrf.planetarium;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +27,7 @@ import okhttp3.Response;
 
 public class RestBaseClient {
     public static final String TAG = "RestBaseServer";
-    private static final String BASE_URL = "https://en.wikipedia.org/api/rest_v1/page/mobile-text/";
+    private static final String BASE_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
 
     public interface OnGetPageResult {
         void onSuccess(String pageContents);
@@ -56,7 +55,7 @@ public class RestBaseClient {
                 Response response = client.newCall(request).execute();
 
                 JSONObject json = new JSONObject(response.body().string());
-                return createPageContent(pageName, json);
+                return parsePageContent(json);
             } catch(Exception e) {
                 listener.onError(e);
             }
@@ -77,33 +76,11 @@ public class RestBaseClient {
         protected void onProgressUpdate(Void... values) { }
     }
 
-    private static String createPageContent(String pageName, JSONObject json) throws JSONException {
-        String contentStr = "";
-        if (!json.has("sections")) {
+    private static String parsePageContent(JSONObject json) throws JSONException {
+        if (!json.has("extract_html")) {
             return "Error: content not found.";
         }
-        String displayTitle = pageName;
-        if (json.has("displaytitle")) {
-            displayTitle = json.getString("displaytitle");
-        }
-        JSONArray sections = json.getJSONArray("sections");
-        JSONObject firstSection = (JSONObject) sections.get(0);
-        if (!firstSection.has("items")) {
-            return "Error: content not found.";
-        }
-
-        contentStr += "<h2>" + displayTitle + "</h2>";
-
-        JSONArray items = firstSection.getJSONArray("items");
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject item = (JSONObject) items.get(i);
-            if (item.getString("type").equals("p")) {
-                contentStr += "<p>";
-                contentStr += item.getString("text");
-                contentStr += "</p>";
-            }
-        }
-        return contentStr;
+        return json.getString("extract_html");
     }
 
 }
