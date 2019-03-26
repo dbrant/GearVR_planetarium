@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name_">Planetarium</string>
+    <string name="app_name">Planetarium</string>
     <string name="sun">Sun</string>
     <string name="moon">Moon</string>
     <string name="mercury">Mercury</string>
